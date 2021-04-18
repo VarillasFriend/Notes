@@ -1,0 +1,15 @@
+{
+    "background_color": "black",
+    "description": "Show photos, when a certain password gets entered.",
+    "display": "fullscreen",
+    "icons": [
+      {
+        "src": "lock.jpeg",
+        "sizes": "474x474",
+        "type": "image/jpg"
+      }
+    ],
+    "name": "Encrypted photos",
+    "short_name": "Encryption",
+    "start_url": "/Encryption"
+}

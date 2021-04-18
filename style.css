@@ -1,0 +1,100 @@
+body {
+    margin: 0;
+    background-color: #000;
+    color: #fff;
+    font-family: "Open Sans", sans-serif;
+}
+
+h1,
+h2,
+h3 {
+    font-family: "Volkhov", serif;
+}
+
+header,
+footer {
+    background-color: #333;
+    color: white;
+    line-height: 100px;
+    padding: 0 20px;
+}
+
+.new-note,
+.edit-note,
+.note-display {
+    padding: 20px;
+}
+
+.new-note,
+.edit-note {
+    background: #333;
+    display: none;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow-y: scroll;
+}
+
+.show-new-note,
+.show-edit-note {
+    display: block;
+}
+
+h1 {
+    margin: 0;
+}
+
+ul {
+    list-style-type: none;
+}
+
+div {
+    margin-bottom: 10px;
+}
+
+.notes-title {
+    display: flex;
+}
+
+.icon-tabler-edit {
+    right: 1rem;
+    position: fixed;
+}
+
+.icon-tabler-x, .icon-tabler-x2 {
+    right: 1rem;
+    top: 20px;
+    position: fixed;
+}
+
+#title, #title2 {
+    width: 95%;
+    resize: none;
+    margin: 0 0 0;
+    min-height: 3rem;
+    height: 3rem;
+    border: none;
+    outline: none;
+    color: white;
+    background-color: #333;
+    font-family: "Volkhov", serif;
+    font-size: 2rem;
+}
+
+#body, #body2 {
+    width: 95%;
+    resize: none;
+    margin: 0 0 0;
+    /* min-height: 5rem;
+    max-height: none; */
+    height: auto;
+    border: none;
+    outline: none;
+    color: white;
+    background-color: #333;
+    font-family: "Open Sans", sans-serif;
+    font-size: 1rem;
+}

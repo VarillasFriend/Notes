@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang='en'>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link href="style.css" rel="stylesheet" />
+        <script src="index.js" defer></script>
+        <link rel="manifest" href="manifest.webmanifest" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap"
+            rel="stylesheet"
+        />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Volkhov&display=swap"
+            rel="stylesheet"
+        />
+        <title> Notes </title>
+    </head>
+    <body>
+        <header>
+            <h1>Notes</h1>
+        </header>
+
+        <main>
+            <section class="note-display">
+                <div class='notes-title'>
+                    <h2>Notes</h2>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-edit" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M9 7h-3a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-3" />
+                        <path d="M9 15h3l8.5 -8.5a1.5 1.5 0 0 0 -3 -3l-8.5 8.5v3" />
+                        <line x1="16" y1="5" x2="19" y2="8" />
+                    </svg>
+                </div>
+                <ul></ul>
+            </section>
+        </main>
+
+        <section class="new-note">
+            <h2>Enter a new note</h2>
+            <form class='new-note-form'>
+                <div class='new-note-title'>
+                    <textarea id="title" maxlength="70" placeholder="Note title..." required></textarea>
+                </div>
+                <div class='new-note-text'>
+                    <textarea id="body" placeholder="Note text..." required></textarea>
+                </div>
+                <div>
+                    <button>Create New Note</button>
+                </div>
+            </form>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+        </section>
+        <section class="edit-note">
+            <form class='edit-note-form'>
+                <div class='new-note-title'>
+                    <textarea id="title2" maxlength="70" placeholder="Note title..." required></textarea>
+                </div>
+                <div class='new-note-text'>
+                    <textarea id="body2" placeholder="Note text..." required></textarea>
+                </div>
+                <div>
+                    <button id='edit'>Edit Note</button>
+                </div>
+            </form>
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-x2" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+        </section>
+    </body>
+</html>
