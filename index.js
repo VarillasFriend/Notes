@@ -1,5 +1,5 @@
 // Create needed constants
-const list = document.querySelector("ul"),
+const list = document.querySelector("#list"),
     titleInput = document.querySelector("#title"),
     bodyInput = document.querySelector("#body"),
     form = document.querySelector("form"),
@@ -7,7 +7,8 @@ const list = document.querySelector("ul"),
     edit = document.querySelector(".icon-tabler-edit"),
     newNote = document.querySelector(".new-note"),
     editNote = document.querySelector(".edit-note"),
-    form2 = document.querySelector(".edit-note-form");
+    form2 = document.querySelector(".edit-note-form"),
+    md = new Remarkable();
 
 class Clicker {
     constructor(element, action, parameters = null) {
@@ -19,72 +20,92 @@ class Clicker {
             element.tabIndex = 0;
             element.style.cursor = "pointer";
 
-            element.onclick = function () {
-                action(parameters);
-            };
-
-            element.onkeydown = function (event) {
-                if (event.keyCode == 32 || event.keyCode == 13) {
-                    event.preventDefault();
+            if (parameters == "event") {
+                element.onclick = function (e) {
+                    action(e);
+                };
+                element.onkeydown = function (event) {
+                    if (event.keyCode == 32 || event.keyCode == 13) {
+                        event.preventDefault();
+                        action(event);
+                    }
+                };
+            } else {
+                element.onclick = function () {
                     action(parameters);
-                }
-            };
+                };
+                element.onkeydown = function (event) {
+                    if (event.keyCode == 32 || event.keyCode == 13) {
+                        event.preventDefault();
+                        action(parameters);
+                    }
+                };
+            }
         };
     }
 }
 
 newClicker = new Clicker(
     document.querySelector(".icon-tabler-edit"),
-    showNewNote
+    showNewNote,
+    true
 );
 newClicker.createClick();
 
-function showNewNote() {
-    newNote.classList.add("show-new-note");
-}
-
 xClicker = new Clicker(
     document.querySelector(".icon-tabler-x"),
-    stopShowNewNote
+    showNewNote,
+    false
 );
 xClicker.createClick();
 
+function showNewNote(add) {
+    if (add) {
+        newNote.classList.add("show-new-note");
+    } else {
+        newNote.classList.remove("show-new-note");
+        document.querySelector("#title").innerText = "";
+        document.querySelector("#body").innerHTML = "";
+    }
+}
+
 x2Clicker = new Clicker(
     document.querySelector(".icon-tabler-x2"),
-    stopShowEditNote
+    showEditNote,
+    false
 );
 x2Clicker.createClick();
 
-function stopShowNewNote() {
-    newNote.classList.remove("show-new-note");
+function showEditNote(add) {
+    if (add) {
+        editNote.classList.add("show-edit-note");
+    } else {
+        editNote.classList.remove("show-edit-note");
+        document.querySelector("#title2").value = "";
+        document.querySelector("#body2").value = "";
+    }
 }
 
 document.querySelector("#body").addEventListener("input", autoResizeHeight);
 
 function autoResizeHeight() {
     document.querySelector("#body").style.height = "auto";
-    document.querySelector("#body").style.height = this.scrollHeight + "px";
+    document.querySelector("#body").style.height =
+        document.querySelector("#body").scrollHeight + "px";
 }
 
 document.querySelector("#body2").addEventListener("input", autoResizeHeight2);
 
 function autoResizeHeight2() {
     document.querySelector("#body2").style.height = "auto";
-    document.querySelector("#body2").style.height = this.scrollHeight + "px";
+    document.querySelector("#body2").style.height =
+        document.querySelector("#body2").scrollHeight + "px";
 }
 
-function showEditNote() {
-    editNote.classList.add("show-edit-note");
-}
+form.onsubmit = addItem;
 
-function stopShowEditNote() {
-    editNote.classList.remove("show-edit-note");
-}
-
-// Create an instance of a db object for us to store the open database in
 let db;
-
-window.onload = function () {
+function start() {
     // Open our database; it is created if it doesn't already exist
     // (see onupgradeneeded below)
     let request = window.indexedDB.open("notes_db", 1);
@@ -123,204 +144,193 @@ window.onload = function () {
 
         console.log("Database setup complete");
     };
+}
 
-    // Create an onsubmit handler so that when the form is submitted the addData() function is run
-    form.onsubmit = addData;
-
-    // Define the addData() function
-    function addData(e) {
-        // prevent default - we don't want the form to submit in the conventional way
-        e.preventDefault();
-
-        // grab the values entered into the form fields and store them in an object ready for being inserted into the DB
-        let newItem = { title: titleInput.value, body: bodyInput.value };
-
-        // open a read/write db transaction, ready for adding the data
-        let transaction = db.transaction(["notes_os"], "readwrite");
-
-        // call an object store that's already been added to the database
-        let objectStore = transaction.objectStore("notes_os");
-
-        // Make a request to add our newItem object to the object store
-        var request = objectStore.add(newItem);
-        request.onsuccess = function () {
-            // Clear the form, ready for adding the next entry
-            titleInput.value = "";
-            bodyInput.value = "";
-        };
-
-        // Report on the success of the transaction completing, when everything is done
-        transaction.oncomplete = function () {
-            console.log(
-                "Transaction completed: database modification finished."
-            );
-
-            // update the display of data to show the newly added item, by running displayData() again.
-            displayData();
-            stopShowNewNote();
-        };
-
-        transaction.onerror = function () {
-            console.log("Transaction not opened due to error");
-        };
+function displayData() {
+    // Here we empty the contents of the list element each time the display is updated
+    // If you ddn't do this, you'd get duplicates listed each time a new note is added
+    while (list.firstChild) {
+        list.removeChild(list.firstChild);
     }
+    // Open our object store and then get a cursor - which iterates through all the
+    // different data items in the store
+    let objectStore = db.transaction("notes_os").objectStore("notes_os");
+    objectStore.openCursor().onsuccess = function (e) {
+        // Get a reference to the cursor
+        let cursor = e.target.result;
+        // If there is still another data item to iterate through, keep running this code
+        if (cursor) {
+            // Create a list item, h3, and p to put each data item inside when displaying it
+            // structure the HTML fragment, and append it inside the list
+            const listItem = document.createElement("div");
+            const h3 = document.createElement("h3");
+            const para = document.createElement("p");
+            listItem.appendChild(h3);
+            listItem.appendChild(para);
+            list.appendChild(listItem);
 
-    // Define the displayData() function
-    function displayData() {
-        // Here we empty the contents of the list element each time the display is updated
-        // If you ddn't do this, you'd get duplicates listed each time a new note is added
-        while (list.firstChild) {
-            list.removeChild(list.firstChild);
-        }
+            listItemClicker = new Clicker(listItem, editItem, "event");
+            listItemClicker.createClick();
 
-        // Open our object store and then get a cursor - which iterates through all the
-        // different data items in the store
-        let objectStore = db.transaction("notes_os").objectStore("notes_os");
-        objectStore.openCursor().onsuccess = function (e) {
-            // Get a reference to the cursor
-            let cursor = e.target.result;
+            // Put the data from the cursor inside the h3 and para
+            h3.textContent = cursor.value.title;
+            para.innerHTML = md.render(cursor.value.body);
 
-            // If there is still another data item to iterate through, keep running this code
-            if (cursor) {
-                // Create a list item, h3, and p to put each data item inside when displaying it
-                // structure the HTML fragment, and append it inside the list
-                const listItem = document.createElement("li");
-                const h3 = document.createElement("h3");
-                const para = document.createElement("p");
+            // Store the ID of the data item inside an attribute on the listItem, so we know
+            // which item it corresponds to. This will be useful later when we want to delete items
+            listItem.setAttribute("data-note-id", cursor.value.id);
 
-                listItem.appendChild(h3);
-                listItem.appendChild(para);
-                list.appendChild(listItem);
+            // Create a button and place it inside each listItem
+            const deleteBtn = document.createElement("button");
+            listItem.appendChild(deleteBtn);
+            deleteBtn.textContent = "Delete";
 
-                listItem.onclick = editItem;
+            // Set an event handler so that when the button is clicked, the destroy()
+            // function is run
+            deleteBtn.onclick = function () {
+                destroy(note.id);
+            };
 
-                // Put the data from the cursor inside the h3 and para
-                h3.textContent = cursor.value.title;
-                para.textContent = cursor.value.body;
-
-                // Store the ID of the data item inside an attribute on the listItem, so we know
-                // which item it corresponds to. This will be useful later when we want to delete items
-                listItem.setAttribute("data-note-id", cursor.value.id);
-
-                // Create a button and place it inside each listItem
-                const deleteBtn = document.createElement("button");
-                listItem.appendChild(deleteBtn);
-                deleteBtn.textContent = "Delete";
-
-                // Set an event handler so that when the button is clicked, the deleteItem()
-                // function is run
-                deleteBtn.onclick = deleteItem;
-
-                // Iterate to the next item in the cursor
-                cursor.continue();
-            } else {
-                // Again, if list item is empty, display a 'No notes stored' message
-                if (!list.firstChild) {
-                    const listItem = document.createElement("li");
-                    listItem.textContent = "No notes stored.";
-                    list.appendChild(listItem);
-                }
-                // if there are no more cursor items to iterate through, say so
-                console.log("Notes all displayed");
-            }
-        };
-    }
-
-    // Define the deleteItem() function
-    function deleteItem(e) {
-        // retrieve the name of the task we want to delete. We need
-        // to convert it to a number before trying it use it with IDB; IDB key
-        // values are type-sensitive.
-        let noteId = Number(e.target.parentNode.getAttribute("data-note-id"));
-
-        // open a database transaction and delete the task, finding it using the id we retrieved above
-        let transaction = db.transaction(["notes_os"], "readwrite");
-        let objectStore = transaction.objectStore("notes_os");
-        let request = objectStore.delete(noteId);
-
-        // report that the data item has been deleted
-        transaction.oncomplete = function () {
-            // delete the parent of the button
-            // which is the list item, so it is no longer displayed
-            e.target.parentNode.parentNode.removeChild(e.target.parentNode);
-            console.log("Note " + noteId + " deleted.");
-
+            // Iterate to the next item in the cursor
+            cursor.continue();
+        } else {
             // Again, if list item is empty, display a 'No notes stored' message
             if (!list.firstChild) {
                 const listItem = document.createElement("li");
                 listItem.textContent = "No notes stored.";
                 list.appendChild(listItem);
             }
-        };
-    }
+            // if there are no more cursor items to iterate through, say so
+            console.log("Notes all displayed");
+        }
+    };
+}
 
-    function editItem(e) {
-        let noteId = Number(e.target.parentNode.getAttribute("data-note-id"));
+function create(newItem) {
+    // open a read/write db transaction, ready for adding the data
+    console.log(db);
+    let transaction = db.transaction(["notes_os"], "readwrite");
 
-        let objectStore = db.transaction("notes_os").objectStore("notes_os");
-        objectStore.openCursor().onsuccess = function (e2) {
-            // Get a reference to the cursor
-            let cursor = e2.target.result;
+    // call an object store that's already been added to the database
+    let objectStore = transaction.objectStore("notes_os");
 
-            // If there is still another data item to iterate through, keep running this code
-            if (cursor) {
-                if (cursor.value.id == noteId) {
-                    showEditNote();
+    // Make a request to add our newItem object to the object store
+    var request = objectStore.add(newItem);
+    request.onsuccess = function () {
+        // Clear the form, ready for adding the next entry
+        titleInput.value = "";
+        bodyInput.value = "";
+    };
 
-                    document.querySelector("#title2").innerText =
-                        cursor.value.title;
-                    document.querySelector("#body2").innerText =
-                        cursor.value.body;
+    // Report on the success of the transaction completing, when everything is done
+    transaction.oncomplete = function () {
+        console.log("Transaction completed: database modification finished.");
 
-                    console.log(cursor);
-                    form2.onsubmit = function () {
-                        updateItem(
-                            noteId,
-                            document.querySelector("#title2").value,
-                            document.querySelector("#body2").value
-                        );
-                    };
-                } else {
-                    cursor.continue();
-                }
+        // update the display of data to show the newly added item, by running displayData() again.
+        displayData();
+        stopShowNewNote();
+    };
+
+    transaction.onerror = function () {
+        console.log("Transaction not opened due to error");
+    };
+
+    return request, transaction;
+}
+
+function destroy(noteId) {
+    // open a database transaction and delete the task, finding it using the id we retrieved above
+    let transaction = db.transaction(["notes_os"], "readwrite");
+    let objectStore = transaction.objectStore("notes_os");
+    let request = objectStore.delete(noteId);
+
+    // report that the data item has been deleted
+    transaction.oncomplete = function () {
+        // delete the parent of the button
+        // which is the list item, so it is no longer displayed
+        e.target.parentNode.parentNode.removeChild(e.target.parentNode);
+        console.log("Note " + noteId + " deleted.");
+
+        // Again, if list item is empty, display a 'No notes stored' message
+        if (!list.firstChild) {
+            const listItem = document.createElement("li");
+            listItem.textContent = "No notes stored.";
+            list.appendChild(listItem);
+        }
+    };
+}
+
+function update(noteId, title, body) {
+    // grab the values entered into the form fields and store them in an object ready for being inserted into the DB
+    let editedItem = {
+        title: title,
+        body: body,
+        id: noteId,
+    };
+
+    // open a read/write db transaction, ready for adding the data
+    let transaction = db.transaction(["notes_os"], "readwrite");
+
+    // call an object store that's already been added to the database
+    let objectStore = transaction.objectStore("notes_os");
+
+    // Make a request to add our newItem object to the object store
+    var request = objectStore.put(editedItem);
+
+    // Report on the success of the transaction completing, when everything is done
+    transaction.oncomplete = function () {
+        console.log("Transaction completed: database modification finished.");
+
+        // update the display of data to show the newly added item, by running displayData() again.
+        displayData();
+        showEditNote(false);
+
+        document.querySelector("#title2").innerText = "";
+        document.querySelector("#body2").innerHTML = "";
+    };
+
+    transaction.onerror = function () {
+        console.log("Transaction not opened due to error");
+    };
+}
+
+function addItem(e) {
+    e.preventDefault;
+    create({ title: titleInput.value, body: bodyInput.value });
+}
+
+function editItem(e) {
+    let noteId = Number(e.target.parentNode.getAttribute("data-note-id"));
+
+    let objectStore = db.transaction("notes_os").objectStore("notes_os");
+    objectStore.openCursor().onsuccess = function (e2) {
+        // Get a reference to the cursor
+        let cursor = e2.target.result;
+
+        // If there is still another data item to iterate through, keep running this code
+        if (cursor) {
+            if (cursor.value.id == noteId) {
+                showEditNote(true);
+
+                document.querySelector("#title2").value = cursor.value.title;
+                document.querySelector("#body2").value = cursor.value.body;
+                document.querySelector("#body2").focus();
+                autoResizeHeight2();
+
+                form2.onsubmit = function () {
+                    update(
+                        noteId,
+                        document.querySelector("#title2").value,
+                        document.querySelector("#body2").value
+                    );
+                };
+            } else {
+                cursor.continue();
             }
-        };
-    }
+        }
+    };
+}
 
-    function updateItem(noteId, title, body) {
-        // grab the values entered into the form fields and store them in an object ready for being inserted into the DB
-        let editedItem = {
-            title: document.querySelector("#title2").value,
-            body: document.querySelector("#body2").value,
-            id: noteId,
-        };
-
-        // open a read/write db transaction, ready for adding the data
-        let transaction = db.transaction(["notes_os"], "readwrite");
-
-        // call an object store that's already been added to the database
-        let objectStore = transaction.objectStore("notes_os");
-
-        // Make a request to add our newItem object to the object store
-        var request = objectStore.put(editedItem);
-        request.onsuccess = function () {
-            // Clear the form, ready for adding the next entry
-            stopShowEditNote();
-        };
-
-        // Report on the success of the transaction completing, when everything is done
-        transaction.oncomplete = function () {
-            console.log(
-                "Transaction completed: database modification finished."
-            );
-
-            // update the display of data to show the newly added item, by running displayData() again.
-            displayData();
-            stopShowNewNote();
-        };
-
-        transaction.onerror = function () {
-            console.log("Transaction not opened due to error");
-        };
-    }
+window.onload = function () {
+    start();
 };
