@@ -1,15 +1,15 @@
 {
     "background_color": "black",
-    "description": "Show photos, when a certain password gets entered.",
+    "description": "Saves notes on the browser.",
     "display": "fullscreen",
     "icons": [
       {
-        "src": "lock.jpeg",
-        "sizes": "474x474",
-        "type": "image/jpg"
+        "src": "./notes.png",
+        "sizes": "512x512",
+        "type": "image/png"
       }
     ],
-    "name": "Encrypted photos",
-    "short_name": "Encryption",
-    "start_url": "/Encryption"
+    "name": "Notes",
+    "short_name": "Notes",
+    "start_url": "/Notes/"
 }

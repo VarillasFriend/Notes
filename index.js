@@ -196,7 +196,7 @@ function displayData() {
         } else {
             // Again, if list item is empty, display a 'No notes stored' message
             if (!list.firstChild) {
-                const listItem = document.createElement("li");
+                const listItem = document.createElement("div");
                 listItem.textContent = "No notes stored.";
                 list.appendChild(listItem);
             }
@@ -253,7 +253,7 @@ function destroy(noteId) {
 
         // Again, if list item is empty, display a 'No notes stored' message
         if (!list.firstChild) {
-            const listItem = document.createElement("li");
+            const listItem = document.createElement("div");
             listItem.textContent = "No notes stored.";
             list.appendChild(listItem);
         }
