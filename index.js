@@ -53,7 +53,7 @@ newClicker = new Clicker(
 newClicker.createClick();
 
 xClicker = new Clicker(
-    document.querySelector(".icon-tabler-x"),
+    document.querySelector("#back"),
     showNewNote,
     false
 );
@@ -69,11 +69,7 @@ function showNewNote(add) {
     }
 }
 
-x2Clicker = new Clicker(
-    document.querySelector(".icon-tabler-x2"),
-    showEditNote,
-    false
-);
+x2Clicker = new Clicker(document.querySelector("#back2"), showEditNote, false);
 x2Clicker.createClick();
 
 function showEditNote(add) {

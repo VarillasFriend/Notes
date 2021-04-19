@@ -15,23 +15,21 @@ code {
     font-family: 'Ubuntu Mono', monospace;
 }
 
-header,
-footer {
+header {
     background-color: #333;
     color: white;
-    line-height: 100px;
+    line-height: 75px;
     padding: 0 20px;
+    display: flex;
 }
 
-.new-note,
-.edit-note,
 .note-display {
     padding: 20px;
 }
 
 .new-note,
 .edit-note {
-    background: #333;
+    background: #000;
     display: none;
     width: 100%;
     position: fixed;
@@ -40,6 +38,11 @@ footer {
     left: 0;
     right: 0;
     overflow-y: scroll;
+}
+
+.new-note-form,
+.edit-note-form {
+    padding: 20px;
 }
 
 .show-new-note,
@@ -61,18 +64,19 @@ div {
 
 .icon-tabler-edit {
     right: 1rem;
-    position: fixed;
-}
-
-.icon-tabler-x, .icon-tabler-x2, .icon-tabler-trash {
-    right: 1rem;
-    top: 20px;
+    top: 15px;
     position: fixed;
 }
 
 .icon-tabler-trash {
-    right: 4rem;
+    right: 1rem;
+    top: 15px;
+    position: absolute;
 }
+
+.icon-tabler-x, .icon-tabler-x2 {
+    margin-top: 15px;
+} 
 
 #title, #title2 {
     width: 95%;
@@ -83,7 +87,7 @@ div {
     border: none;
     outline: none;
     color: white;
-    background-color: #333;
+    background-color: #000;
     font-family: "Volkhov", serif;
     font-size: 2rem;
 }
@@ -98,7 +102,7 @@ div {
     border: none;
     outline: none;
     color: white;
-    background-color: #333;
+    background-color: #000;
     font-family: "Open Sans", sans-serif;
     font-size: 1rem;
 }
@@ -113,4 +117,8 @@ div {
 
 #list div h3 {
     margin-bottom: 0;
+}
+
+#back, #back2 {
+    display: flex;
 }
