@@ -334,3 +334,7 @@ function editItem(e) {
 window.onload = function () {
     start();
 };
+
+if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js");
+}
