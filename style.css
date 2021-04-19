@@ -12,7 +12,7 @@ h3 {
 }
 
 code {
-    font-family: 'Ubuntu Mono', monospace;
+    font-family: "Ubuntu Mono", monospace;
 }
 
 header {
@@ -28,7 +28,8 @@ header {
 }
 
 .new-note,
-.edit-note {
+.edit-note,
+.view-note {
     background: #000;
     display: none;
     width: 100%;
@@ -41,12 +42,14 @@ header {
 }
 
 .new-note-form,
-.edit-note-form {
+.edit-note-form,
+.view-note-form {
     padding: 20px;
 }
 
 .show-new-note,
-.show-edit-note {
+.show-edit-note,
+.show-view-note {
     display: block;
 }
 
@@ -68,17 +71,23 @@ div {
     position: fixed;
 }
 
-.icon-tabler-trash {
+.icon-tabler-trash, .icon-tabler-pencil {
     right: 1rem;
     top: 15px;
     position: absolute;
 }
 
-.icon-tabler-x, .icon-tabler-x2 {
-    margin-top: 15px;
-} 
+.icon-tabler-pencil {
+    right: 4rem;
+}
 
-#title, #title2 {
+.icon-tabler-x,
+.icon-tabler-x2 {
+    margin-top: 15px;
+}
+
+#title,
+#title2 {
     width: 95%;
     resize: none;
     margin: 0 0 0;
@@ -92,7 +101,8 @@ div {
     font-size: 2rem;
 }
 
-#body, #body2 {
+#body,
+#body2 {
     width: 95%;
     resize: none;
     margin: 0 0 0;
@@ -119,6 +129,8 @@ div {
     margin-bottom: 0;
 }
 
-#back, #back2 {
+#back,
+#back2,
+#back3 {
     display: flex;
 }

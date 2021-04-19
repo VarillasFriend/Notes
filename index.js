@@ -7,6 +7,7 @@ const list = document.querySelector("#list"),
     edit = document.querySelector(".icon-tabler-edit"),
     newNote = document.querySelector(".new-note"),
     editNote = document.querySelector(".edit-note"),
+    viewNote = document.querySelector(".view-note"),
     form2 = document.querySelector(".edit-note-form"),
     md = new Remarkable();
 
@@ -52,11 +53,7 @@ newClicker = new Clicker(
 );
 newClicker.createClick();
 
-xClicker = new Clicker(
-    document.querySelector("#back"),
-    showNewNote,
-    false
-);
+xClicker = new Clicker(document.querySelector("#back"), showNewNote, false);
 xClicker.createClick();
 
 function showNewNote(add) {
@@ -69,8 +66,19 @@ function showNewNote(add) {
     }
 }
 
-x2Clicker = new Clicker(document.querySelector("#back2"), showEditNote, false);
+x2Clicker = new Clicker(document.querySelector("#back2"), showViewNote, false);
 x2Clicker.createClick();
+
+function showViewNote(add) {
+    if (add) {
+        viewNote.classList.add("show-view-note");
+    } else {
+        viewNote.classList.remove("show-view-note");
+    }
+}
+
+x3Clicker = new Clicker(document.querySelector("#back3"), showEditNote, false);
+x3Clicker.createClick();
 
 function showEditNote(add) {
     if (add) {
@@ -189,7 +197,7 @@ function displayData() {
 
             textPreview.classList.add("textpreview");
 
-            listItemClicker = new Clicker(listItem, editItem, "event");
+            listItemClicker = new Clicker(listItem, viewItem, "event");
             listItemClicker.createClick();
 
             // Put the data from the cursor inside the h3 and para
@@ -318,9 +326,7 @@ function addItem(e) {
     create(titleInput.value, bodyInput.value);
 }
 
-function editItem(e) {
-    let noteId = Number(e.target.parentNode.getAttribute("data-note-id"));
-
+function editItem(noteId) {
     let objectStore = db.transaction("notes_os").objectStore("notes_os");
     objectStore.openCursor().onsuccess = function (e2) {
         // Get a reference to the cursor
@@ -339,7 +345,7 @@ function editItem(e) {
                 form2.setAttribute("data-note-id", cursor.value.id);
 
                 trashClicker = new Clicker(
-                    document.querySelector(".icon-tabler-trash"),
+                    document.querySelectorAll(".icon-tabler-trash")[1],
                     destroy,
                     Number(form2.attributes["data-note-id"].value)
                 );
@@ -352,6 +358,56 @@ function editItem(e) {
                         document.querySelector("#body2").value
                     );
                 };
+            } else {
+                cursor.continue();
+            }
+        }
+    };
+}
+
+function viewItem(e) {
+    let noteId = Number(e.target.parentNode.getAttribute("data-note-id"));
+
+    let objectStore = db.transaction("notes_os").objectStore("notes_os");
+    objectStore.openCursor().onsuccess = function (e2) {
+        // Get a reference to the cursor
+        let cursor = e2.target.result;
+
+        // If there is still another data item to iterate through, keep running this code
+        if (cursor) {
+            if (cursor.value.id == noteId) {
+                showViewNote(true);
+
+                document.querySelector("#view-title").innerText =
+                    cursor.value.title;
+                document.querySelector("#view-body").innerHTML = md.render(
+                    cursor.value.body
+                );
+                document
+                    .querySelector(".view-note-form")
+                    .setAttribute("data-note-id", cursor.value.id);
+
+                editClicker = new Clicker(
+                    document.querySelector(".icon-tabler-pencil"),
+                    editItem,
+                    Number(
+                        document.querySelector(".view-note-form").attributes[
+                            "data-note-id"
+                        ].value
+                    )
+                );
+                editClicker.createClick();
+
+                trashClicker = new Clicker(
+                    document.querySelectorAll(".icon-tabler-trash")[0],
+                    destroy,
+                    Number(
+                        document.querySelector(".view-note-form").attributes[
+                            "data-note-id"
+                        ].value
+                    )
+                );
+                trashClicker.createClick();
             } else {
                 cursor.continue();
             }
