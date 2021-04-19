@@ -45,12 +45,45 @@ header {
 .edit-note-form,
 .view-note-form {
     padding: 20px;
+    will-change: transform;
 }
 
 .show-new-note,
 .show-edit-note,
 .show-view-note {
+    animation-name: display;
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0,-0.19,0,1);
     display: block;
+}
+
+@keyframes display {
+    0% {
+        transform: translateX(100%);
+    }
+    100% {
+        transform: translateX(0);
+    }
+}
+
+.not-show-new-note,
+.not-show-edit-note,
+.not-show-view-note {
+    animation-name: not-display;
+    animation-duration: 0.5s;
+    animation-timing-function: cubic-bezier(0,-0.19,0,1);
+    display: block;
+}
+
+@keyframes not-display {
+    0% {
+        display: block;
+        transform: translateX(0);
+    }
+    100% {
+        display: block;
+        transform: translateX(100%);
+    }
 }
 
 h1 {
@@ -68,10 +101,11 @@ div {
 .icon-tabler-edit {
     right: 1rem;
     top: 15px;
-    position: fixed;
+    position: absolute;
 }
 
-.icon-tabler-trash, .icon-tabler-pencil {
+.icon-tabler-trash,
+.icon-tabler-pencil {
     right: 1rem;
     top: 15px;
     position: absolute;
@@ -133,4 +167,16 @@ div {
 #back2,
 #back3 {
     display: flex;
+}
+
+table,
+th,
+td {
+    border: 1px solid white;
+    border-collapse: collapse;
+    padding: 5px;
+}
+
+th {
+    border-bottom: 3px solid white;
 }

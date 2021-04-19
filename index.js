@@ -63,6 +63,8 @@ function showNewNote(add) {
         newNote.classList.remove("show-new-note");
         document.querySelector("#title").innerText = "";
         document.querySelector("#body").innerHTML = "";
+        newNote.classList.add("not-show-new-note");
+        setTimeout(() => newNote.classList.remove("not-show-new-note"), 500)
     }
 }
 
@@ -72,8 +74,11 @@ x2Clicker.createClick();
 function showViewNote(add) {
     if (add) {
         viewNote.classList.add("show-view-note");
+
     } else {
         viewNote.classList.remove("show-view-note");
+        viewNote.classList.add("not-show-view-note");
+        setTimeout(() => viewNote.classList.remove("not-show-view-note"), 500)
     }
 }
 
@@ -87,6 +92,8 @@ function showEditNote(add) {
         editNote.classList.remove("show-edit-note");
         document.querySelector("#title2").value = "";
         document.querySelector("#body2").value = "";
+        editNote.classList.add("not-show-edit-note");
+        setTimeout(() => editNote.classList.remove("not-show-edit-note"), 500)
     }
 }
 
@@ -318,6 +325,7 @@ function destroy(noteId) {
         displayData();
         console.log("Note " + noteId + " deleted.");
         showEditNote(false);
+        showViewNote(false);
     };
 }
 
