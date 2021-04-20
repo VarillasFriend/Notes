@@ -195,3 +195,11 @@ td {
 th {
     border-bottom: 3px solid white;
 }
+
+#view-body {
+    word-break: break-all;
+}
+
+#view-title {
+    word-break: break-all;
+}

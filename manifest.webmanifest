@@ -1,5 +1,6 @@
 {
-    "background_color": "#333333",
+    "background_color": "black",
+    "theme_color": "#333",
     "description": "Saves notes on the browser.",
     "display": "fullscreen",
     "icons": [
