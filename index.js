@@ -59,12 +59,14 @@ xClicker.createClick();
 function showNewNote(add) {
     if (add) {
         newNote.classList.add("show-new-note");
+        document.querySelector("main").classList.add("shift");
     } else {
         newNote.classList.remove("show-new-note");
         document.querySelector("#title").innerText = "";
         document.querySelector("#body").innerHTML = "";
         newNote.classList.add("not-show-new-note");
-        setTimeout(() => newNote.classList.remove("not-show-new-note"), 500)
+        document.querySelector("main").classList.remove("shift");
+        setTimeout(() => newNote.classList.remove("not-show-new-note"), 500);
     }
 }
 
@@ -74,11 +76,12 @@ x2Clicker.createClick();
 function showViewNote(add) {
     if (add) {
         viewNote.classList.add("show-view-note");
-
+        document.querySelector("main").classList.add("shift");
     } else {
         viewNote.classList.remove("show-view-note");
         viewNote.classList.add("not-show-view-note");
-        setTimeout(() => viewNote.classList.remove("not-show-view-note"), 500)
+        document.querySelector("main").classList.remove("shift");
+        setTimeout(() => viewNote.classList.remove("not-show-view-note"), 500);
     }
 }
 
@@ -93,7 +96,7 @@ function showEditNote(add) {
         document.querySelector("#title2").value = "";
         document.querySelector("#body2").value = "";
         editNote.classList.add("not-show-edit-note");
-        setTimeout(() => editNote.classList.remove("not-show-edit-note"), 500)
+        setTimeout(() => editNote.classList.remove("not-show-edit-note"), 500);
     }
 }
 

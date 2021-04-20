@@ -21,6 +21,12 @@ header {
     line-height: 75px;
     padding: 0 20px;
     display: flex;
+    height: 75px;
+}
+
+main {
+    transition: transform 0.5s cubic-bezier(0, -0.19, 0, 1);
+    will-change: transform;
 }
 
 .note-display {
@@ -53,7 +59,7 @@ header {
 .show-view-note {
     animation-name: display;
     animation-duration: 0.5s;
-    animation-timing-function: cubic-bezier(0,-0.19,0,1);
+    animation-timing-function: cubic-bezier(0, -0.19, 0, 1);
     display: block;
 }
 
@@ -66,12 +72,16 @@ header {
     }
 }
 
+.shift {
+    transform: translateX(-10%);
+}
+
 .not-show-new-note,
 .not-show-edit-note,
 .not-show-view-note {
     animation-name: not-display;
     animation-duration: 0.5s;
-    animation-timing-function: cubic-bezier(0,-0.19,0,1);
+    animation-timing-function: cubic-bezier(0, -0.19, 0, 1);
     display: block;
 }
 
