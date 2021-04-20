@@ -73,7 +73,7 @@ main {
 }
 
 .shift {
-    transform: translateX(-10%);
+    transform: translateX(-15%);
 }
 
 .not-show-new-note,
@@ -177,6 +177,11 @@ div {
 #back2,
 #back3 {
     display: flex;
+}
+
+.table {
+    overflow-x: auto;
+    max-width: 100%;
 }
 
 table,

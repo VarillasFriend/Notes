@@ -419,6 +419,16 @@ function viewItem(e) {
                     )
                 );
                 trashClicker.createClick();
+
+                document.querySelectorAll("table").forEach((table) => {
+                    let div = document.createElement("div");
+                    div.classList.add("table");
+
+                    table.parentNode.insertBefore(div, table);
+
+                    div.style.width = table.scrollWidth + 'px';
+                    div.appendChild(table);
+                });
             } else {
                 cursor.continue();
             }
