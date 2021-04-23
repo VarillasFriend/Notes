@@ -207,7 +207,7 @@ function displayData() {
 
             textPreview.classList.add("textpreview");
 
-            listItemClicker = new Clicker(listItem, viewItem, "event");
+            listItemClicker = new Clicker(listItem, viewItemHandler, "event");
             listItemClicker.createClick();
 
             // Put the data from the cursor inside the h3 and para
@@ -257,7 +257,7 @@ function create(title, body) {
     let objectStore = transaction.objectStore("notes_os");
 
     // Make a request to add our newItem object to the object store
-    var request = objectStore.add(newItem);
+    let request = objectStore.add(newItem);
     request.onsuccess = function () {
         // Clear the form, ready for adding the next entry
         titleInput.value = "";
@@ -270,7 +270,7 @@ function create(title, body) {
 
         // update the display of data to show the newly added item, by running displayData() again.
         displayData();
-        stopShowNewNote();
+        showNewNote(false);
     };
 
     transaction.onerror = function () {
@@ -296,7 +296,7 @@ function update(noteId, title, body) {
     let objectStore = transaction.objectStore("notes_os");
 
     // Make a request to add our newItem object to the object store
-    var request = objectStore.put(editedItem);
+    let request = objectStore.put(editedItem);
 
     // Report on the success of the transaction completing, when everything is done
     transaction.oncomplete = function () {
@@ -305,6 +305,7 @@ function update(noteId, title, body) {
         // update the display of data to show the newly added item, by running displayData() again.
         displayData();
         showEditNote(false);
+        showViewNote(false);
 
         document.querySelector("#title2").innerText = "";
         document.querySelector("#body2").innerHTML = "";
@@ -333,7 +334,7 @@ function destroy(noteId) {
 }
 
 function addItem(e) {
-    e.preventDefault;
+    e.preventDefault();
     create(titleInput.value, bodyInput.value);
 }
 
@@ -362,7 +363,8 @@ function editItem(noteId) {
                 );
                 trashClicker.createClick();
 
-                form2.onsubmit = function () {
+                form2.onsubmit = function (e) {
+                    e.preventDefault();
                     update(
                         noteId,
                         document.querySelector("#title2").value,
@@ -376,9 +378,12 @@ function editItem(noteId) {
     };
 }
 
-function viewItem(e) {
+function viewItemHandler(e) {
     let noteId = Number(e.target.parentNode.getAttribute("data-note-id"));
+    viewItem(noteId);
+}
 
+function viewItem(noteId) {
     let objectStore = db.transaction("notes_os").objectStore("notes_os");
     objectStore.openCursor().onsuccess = function (e2) {
         // Get a reference to the cursor
@@ -426,7 +431,7 @@ function viewItem(e) {
 
                     table.parentNode.insertBefore(div, table);
 
-                    div.style.width = table.scrollWidth + 'px';
+                    div.style.width = table.scrollWidth + "px";
                     div.appendChild(table);
                 });
             } else {
