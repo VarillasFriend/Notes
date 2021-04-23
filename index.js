@@ -121,7 +121,7 @@ form.onsubmit = addItem;
 let db;
 function start() {
     if (!("indexedDB" in window)) {
-        console.log("This browser doesn't support IndexedDB");
+        alert("It seems that this browser doesn't support IndexedDB, you won't be able to use any functionalities in this site. Please update your browser");
         return;
     }
     // Open our database; it is created if it doesn't already exist
