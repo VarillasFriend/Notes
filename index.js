@@ -116,84 +116,142 @@ function autoResizeHeight2() {
         document.querySelector("#body2").scrollHeight + "px";
 }
 
-form.onsubmit = addItem;
-
-let db;
-function start() {
-    if (!("indexedDB" in window)) {
-        alert("It seems that this browser doesn't support IndexedDB, you won't be able to use any functionalities in this site. Please update your browser");
-        return;
-    }
-    // Open our database; it is created if it doesn't already exist
-    // (see onupgradeneeded below)
-    let request = window.indexedDB.open("notes_db", 2);
-
-    // onerror handler signifies that the database didn't open successfully
-    request.onerror = function (e) {
-        console.log("Database failed to open due to:");
-        console.log(e);
-    };
-
-    // onsuccess handler signifies that the database opened successfully
-    request.onsuccess = function () {
-        console.log("Database opened succesfully");
-
-        // Store the opened database object in the db variable. This is used a lot below
-        db = request.result;
-
-        // Run the displayData() function to display the notes already in the IDB
-        displayData();
-    };
-
-    // Setup the database tables if this has not already been done
-    request.onupgradeneeded = function (e) {
-        // Grab a reference to the opened database
-        let db = e.target.result;
-
-        if (e.oldVersion < 1) {
-            // Create an objectStore to store our notes in (basically like a single table)
-            // including a auto-incrementing key
-            let objectStore = db.createObjectStore("notes_os", {
-                keyPath: "id",
-                autoIncrement: true,
-            });
-
-            // Define what data items the objectStore will contain
-            objectStore.createIndex("title", "title", { unique: false });
-            objectStore.createIndex("body", "body", { unique: false });
-
-            console.log("Database setup complete");
-        }
-
-        if (e.oldVersion < 2) {
-            console.log(db);
-            let objectStore = e.currentTarget.transaction.objectStore(
-                "notes_os"
-            );
-            objectStore.createIndex("timestamps", "timestamps", {
-                unique: false,
-            });
-        }
-    };
+form.onsubmit =function () {
+    addItem;
 }
 
-function displayData() {
-    // Here we empty the contents of the list element each time the display is updated
-    // If you ddn't do this, you'd get duplicates listed each time a new note is added
-    while (list.firstChild) {
-        list.removeChild(list.firstChild);
+class Note {
+    constructor(title, body, timestamps = new Date(), id = Note.all().length) {
+        this.title = title;
+        this.body = body;
+        this.timestamps = timestamps;
+        this.id = id;
     }
-    // Open our object store and then get a cursor - which iterates through all the
-    // different data items in the store
-    let objectStore = db.transaction("notes_os").objectStore("notes_os");
-    objectStore.openCursor().onsuccess = function (e) {
-        // Get a reference to the cursor
-        let cursor = e.target.result;
 
-        // If there is still another data item to iterate through, keep running this code
-        if (cursor) {
-            // Create a list item, h3, and p to put each data item inside when displaying it
-            // structure the HTML fragment, and append it inside the list
+    static initialize() {
+        if (!localStorage["notes"]) {
+            localStorage["notes"] = JSON.stringify([]);
+        }
+    }
+
+    static create(title, body) {
+        let newItem = { title: title, body: body, timestamps: new Date() };
+
+        let notes = JSON.parse(localStorage["notes"]);
+
+        notes.push(newItem);
+
+        localStorage["notes"] = JSON.stringify(notes);
+
+        console.log("Note created");
+    }
+
+    static all() {
+        const notes = JSON.parse(localStorage["notes"]);
+        let notesObjects = [];
+
+        notes.forEach(function (note) {
+            note["timestamps"] = new Date(note["timestamps"]);
+
+            const noteObject = new Note(
+                note["title"],
+                note["body"],
+                note["timestamps"],
+                notes.indexOf(note)
+            );
+            notesObjects.push(noteObject);
+        });
+
+        return notesObjects;
+    }
+
+    save() {
+        let notes = JSON.parse(localStorage["notes"]);
+
+        if (notes[this.id]) {
+            let editedItem = {
+                title: this.title,
+                body: this.body,
+                timestamps: new Date(),
+            };
+
+            notes[this.id] = editedItem;
+
+            localStorage["notes"] = JSON.stringify(notes);
+
+            console.log("Note " + this.id + " updated.");
+        } else {
+            let newItem = {
+                title: this.title,
+                body: this.body,
+                timestamps: new Date(),
+            };
+
+            notes.push(newItem);
+
+            localStorage["notes"] = JSON.stringify(notes);
+
+            console.log("Note created");
+        }
+    }
+
+    destroy() {
+        let notes = JSON.parse(localStorage["notes"]);
+
+        notes.splice(this.id, 1);
+
+        localStorage["notes"] = JSON.stringify(notes);
+
+        Note.displayData();
+        console.log("Note " + this.id + " deleted.");
+
+        ////////////////////
+        showEditNote(false);
+        showViewNote(false);
+    }
+
+    static updateNote(noteId, title, body) {
+        let editedItem = {
+            title: title,
+            body: body,
+            timestamps: new Date(),
+        };
+
+        let notes = JSON.parse(localStorage["notes"]);
+
+        notes[noteId] = editedItem;
+
+        localStorage["notes"] = JSON.stringify(notes);
+
+        console.log("Note " + noteId + " updated.");
+
+        Note.displayData();
+
+        document.querySelector("#title2").innerText = "";
+        document.querySelector("#body2").innerHTML = "";
+    }
+
+    static destroy(noteId) {
+        let notes = JSON.parse(localStorage["notes"]);
+
+        notes.splice(noteId, 1);
+
+        localStorage["notes"] = JSON.stringify(notes);
+
+        Note.displayData();
+        console.log("Note " + noteId + " deleted.");
+        showEditNote(false);
+        showViewNote(false);
+    }
+
+    static displayData() {
+        while (list.firstChild) {
+            list.removeChild(list.firstChild);
+        }
+
+        const notes = Note.all();
+
+        notes.forEach(function (note) {
             const listItem = document.createElement("div");
             const h3 = document.createElement("h3");
             const textPreview = document.createElement("div");
@@ -207,21 +265,23 @@ function displayData() {
 
             textPreview.classList.add("textpreview");
 
-            listItemClicker = new Clicker(listItem, viewItemHandler, "event");
+            const listItemClicker = new Clicker(
+                listItem,
+                viewItemHandler,
+                "event"
+            );
+
             listItemClicker.createClick();
 
-            // Put the data from the cursor inside the h3 and para
-            h3.textContent = cursor.value.title;
+            h3.textContent = note.title;
             para.textContent =
-                cursor.value.body.length > 70
-                    ? cursor.value.body.substr(0, 70) + "..."
-                    : cursor.value.body;
+                note.body.length > 70
+                    ? note.body.substr(0, 70) + "..."
+                    : note.body;
 
-            // Store the ID of the data item inside an attribute on the listItem, so we know
-            // which item it corresponds to. This will be useful later when we want to delete items
-            listItem.setAttribute("data-note-id", cursor.value.id);
+            listItem.setAttribute("data-note-id", note.id);
 
-            let timestamps = cursor.value.timestamps;
+            let timestamps = new Date(note.timestamps);
             let minutes =
                 timestamps.getMinutes() < 10
                     ? "0" + timestamps.getMinutes()
@@ -231,151 +291,82 @@ function displayData() {
                     ? timestamps.getHours() + ":" + minutes
                     : timestamps.getDate() + "/" + timestamps.getMonth();
             para2.classList.add("timestamps");
+        });
 
-            // Iterate to the next item in the cursor
-            cursor.continue();
-        } else {
-            // Again, if list item is empty, display a 'No notes stored' message
-            if (!list.firstChild) {
-                const listItem = document.createElement("div");
-                listItem.textContent = "No notes stored.";
-                list.appendChild(listItem);
-            }
-            // if there are no more cursor items to iterate through, say so
-            console.log("Notes all displayed");
+        if (!list.firstChild) {
+            const listItem = document.createElement("div");
+            listItem.textContent = "No notes stored.";
+            list.appendChild(listItem);
         }
-    };
-}
-
-function create(title, body) {
-    let newItem = { title: title, body: body, timestamps: new Date() };
-
-    // open a read/write db transaction, ready for adding the data
-    let transaction = db.transaction(["notes_os"], "readwrite");
-
-    // call an object store that's already been added to the database
-    let objectStore = transaction.objectStore("notes_os");
-
-    // Make a request to add our newItem object to the object store
-    let request = objectStore.add(newItem);
-    request.onsuccess = function () {
-        // Clear the form, ready for adding the next entry
-        titleInput.value = "";
-        bodyInput.value = "";
-    };
-
-    // Report on the success of the transaction completing, when everything is done
-    transaction.oncomplete = function () {
-        console.log("Transaction completed: database modification finished.");
-
-        // update the display of data to show the newly added item, by running displayData() again.
-        displayData();
-        showNewNote(false);
-    };
-
-    transaction.onerror = function () {
-        console.log("Transaction not opened due to error");
-    };
-
-    return request, transaction;
-}
-
-function update(noteId, title, body) {
-    // grab the values entered into the form fields and store them in an object ready for being inserted into the DB
-    let editedItem = {
-        title: title,
-        body: body,
-        id: noteId,
-        timestamps: new Date(),
-    };
-
-    // open a read/write db transaction, ready for adding the data
-    let transaction = db.transaction(["notes_os"], "readwrite");
-
-    // call an object store that's already been added to the database
-    let objectStore = transaction.objectStore("notes_os");
-
-    // Make a request to add our newItem object to the object store
-    let request = objectStore.put(editedItem);
-
-    // Report on the success of the transaction completing, when everything is done
-    transaction.oncomplete = function () {
-        console.log("Transaction completed: database modification finished.");
-
-        // update the display of data to show the newly added item, by running displayData() again.
-        displayData();
-        showEditNote(false);
-        showViewNote(false);
-
-        document.querySelector("#title2").innerText = "";
-        document.querySelector("#body2").innerHTML = "";
-    };
-
-    transaction.onerror = function () {
-        console.log("Transaction not opened due to error");
-    };
-}
-
-function destroy(noteId) {
-    // open a database transaction and delete the task, finding it using the id we retrieved above
-    let transaction = db.transaction(["notes_os"], "readwrite");
-    let objectStore = transaction.objectStore("notes_os");
-    let request = objectStore.delete(noteId);
-
-    // report that the data item has been deleted
-    transaction.oncomplete = function () {
-        // delete the parent of the button
-        // which is the list item, so it is no longer displaye
-        displayData();
-        console.log("Note " + noteId + " deleted.");
-        showEditNote(false);
-        showViewNote(false);
-    };
+        console.log("Notes displayed");
+    }
 }
 
 function addItem(e) {
     e.preventDefault();
-    create(titleInput.value, bodyInput.value);
+    Note.create(titleInput.value, bodyInput.value);
+
+    Note.displayData();
+    showNewNote(false);
+
+    titleInput.value = "";
+    bodyInput.value = "";
 }
 
 function editItem(noteId) {
-    let objectStore = db.transaction("notes_os").objectStore("notes_os");
-    objectStore.openCursor().onsuccess = function (e2) {
-        // Get a reference to the cursor
-        let cursor = e2.target.result;
+    const notes = Note.all();
+    note = notes[noteId];
 
-        // If there is still another data item to iterate through, keep running this code
-        if (cursor) {
-            if (cursor.value.id == noteId) {
-                showEditNote(true);
+    showEditNote(true);
 
-                document.querySelector("#title2").value = cursor.value.title;
-                document.querySelector("#body2").value = cursor.value.body;
-                document.querySelector("#body2").focus();
-                autoResizeHeight2();
+    document.querySelector("#title2").value = note.title;
+    document.querySelector("#body2").value = note.body;
+    document.querySelector("#body2").focus();
+    autoResizeHeight2();
 
-                form2.setAttribute("data-note-id", cursor.value.id);
+    form2.setAttribute("data-note-id", note.id);
 
-                trashClicker = new Clicker(
-                    document.querySelectorAll(".icon-tabler-trash")[1],
-                    destroy,
-                    Number(form2.attributes["data-note-id"].value)
-                );
-                trashClicker.createClick();
+    trashClicker = new Clicker(
+        document.querySelectorAll(".icon-tabler-trash")[1],
+        Note.destroy,
+        Number(form2.attributes["data-note-id"].value)
+    );
+    trashClicker.createClick();
 
-                form2.onsubmit = function (e) {
-                    e.preventDefault();
-                    update(
-                        noteId,
-                        document.querySelector("#title2").value,
-                        document.querySelector("#body2").value
-                    );
-                };
-            } else {
-                cursor.continue();
-            }
-        }
+    form2.onsubmit = function (e) {
+        e.preventDefault();
+        Note.updateNote(
+            noteId,
+            document.querySelector("#title2").value,
+            document.querySelector("#body2").value
+        );
+        showEditNote(false);
+        showViewNote(false);
     };
+
+    document.querySelector("#body2").oninput = function () {
+        Note.updateNote(
+            noteId,
+            document.querySelector("#title2").value,
+            document.querySelector("#body2").value
+        );
+        updateViewNote(note);
+    };
+
+    document.querySelector("#title2").oninput = function () {
+        Note.updateNote(
+            noteId,
+            document.querySelector("#title2").value,
+            document.querySelector("#body2").value
+        );
+        updateViewNote(note);
+    };
+}
+
+function updateViewNote(note) {
+    console.log('dasdasd')
+    document.querySelector("#view-title").innerText = document.querySelector("#title2").value;
+    document.querySelector("#view-body").innerHTML = md.render(document.querySelector("#body2").value);
 }
 
 function viewItemHandler(e) {
@@ -384,65 +375,50 @@ function viewItemHandler(e) {
 }
 
 function viewItem(noteId) {
-    let objectStore = db.transaction("notes_os").objectStore("notes_os");
-    objectStore.openCursor().onsuccess = function (e2) {
-        // Get a reference to the cursor
-        let cursor = e2.target.result;
+    const notes = Note.all();
+    note = notes[noteId];
 
-        // If there is still another data item to iterate through, keep running this code
-        if (cursor) {
-            if (cursor.value.id == noteId) {
-                showViewNote(true);
+    showViewNote(true);
 
-                document.querySelector("#view-title").innerText =
-                    cursor.value.title;
-                document.querySelector("#view-body").innerHTML = md.render(
-                    cursor.value.body
-                );
-                document
-                    .querySelector(".view-note-form")
-                    .setAttribute("data-note-id", cursor.value.id);
+    document.querySelector("#view-title").innerText = note.title;
+    document.querySelector("#view-body").innerHTML = md.render(note.body);
+    document
+        .querySelector(".view-note-form")
+        .setAttribute("data-note-id", note.id);
 
-                editClicker = new Clicker(
-                    document.querySelector(".icon-tabler-pencil"),
-                    editItem,
-                    Number(
-                        document.querySelector(".view-note-form").attributes[
-                            "data-note-id"
-                        ].value
-                    )
-                );
-                editClicker.createClick();
+    editClicker = new Clicker(
+        document.querySelector(".icon-tabler-pencil"),
+        editItem,
+        Number(
+            document.querySelector(".view-note-form").attributes["data-note-id"]
+                .value
+        )
+    );
+    editClicker.createClick();
 
-                trashClicker = new Clicker(
-                    document.querySelectorAll(".icon-tabler-trash")[0],
-                    destroy,
-                    Number(
-                        document.querySelector(".view-note-form").attributes[
-                            "data-note-id"
-                        ].value
-                    )
-                );
-                trashClicker.createClick();
+    trashClicker = new Clicker(
+        document.querySelectorAll(".icon-tabler-trash")[0],
+        Note.destroy,
+        Number(
+            document.querySelector(".view-note-form").attributes["data-note-id"]
+                .value
+        )
+    );
+    trashClicker.createClick();
 
-                document.querySelectorAll("table").forEach((table) => {
-                    let div = document.createElement("div");
-                    div.classList.add("table");
+    document.querySelectorAll("table").forEach((table) => {
+        let div = document.createElement("div");
+        div.classList.add("table");
 
-                    table.parentNode.insertBefore(div, table);
+        table.parentNode.insertBefore(div, table);
 
-                    div.style.width = table.scrollWidth + "px";
-                    div.appendChild(table);
-                });
-            } else {
-                cursor.continue();
-            }
-        }
-    };
+        div.appendChild(table);
+    });
 }
 
 window.onload = function () {
-    start();
+    Note.initialize();
+    Note.displayData();
 };
 
 if ("serviceWorker" in navigator) {

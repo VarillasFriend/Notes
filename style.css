@@ -201,6 +201,14 @@ th {
     word-break: break-all;
 }
 
+#view-body h1 {
+    font-size: 2rem;
+}
+
+#view-body h2 {
+    font-size: 1.6rem;
+}
+
 #view-title {
     word-break: break-all;
 }
