@@ -28,6 +28,21 @@ header {
     padding: 0 20px;
     display: flex;
     height: 75px;
+    width: 100%;
+}
+
+.view-note header {
+    z-index: 12;
+    position: fixed;
+}
+
+.edit-note header {
+    z-index: 13;
+    position: fixed;
+}
+
+.not-header {
+    margin-top: 75px;
 }
 
 main {
@@ -159,8 +174,6 @@ div {
     width: 95%;
     resize: none;
     margin: 0 0 0;
-    /* min-height: 5rem;
-    max-height: none; */
     height: auto;
     border: none;
     outline: none;

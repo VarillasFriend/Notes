@@ -25,59 +25,66 @@
         <title>Notes</title>
     </head>
     <body>
-        <header>
-            <h1>Notes</h1>
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="icon icon-tabler icon-tabler-edit"
-                width="44"
-                height="44"
-                viewBox="0 0 24 24"
-                stroke-width="1.5"
-                stroke="currentColor"
-                fill="none"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path
-                    d="M9 7h-3a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-3"
+        <section class="note-index">
+            <header>
+                <h1>Notes</h1>
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="icon icon-tabler icon-tabler-edit"
+                    width="44"
+                    height="44"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    fill="none"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path
+                        d="M9 7h-3a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-3"
+                    />
+                    <path d="M9 15h3l8.5 -8.5a1.5 1.5 0 0 0 -3 -3l-8.5 8.5v3" />
+                    <line x1="16" y1="5" x2="19" y2="8" />
+                </svg>
+            </header>
+
+            <form class="password-form">
+                <h1>Password</h1>
+                <input
+                    type="password"
+                    class="password-form-input"
+                    placeholder="password..."
                 />
-                <path d="M9 15h3l8.5 -8.5a1.5 1.5 0 0 0 -3 -3l-8.5 8.5v3" />
-                <line x1="16" y1="5" x2="19" y2="8" />
-            </svg>
-        </header>
+                <br /><br />
+                <button>Enter Password</button>
+            </form>
 
-        <form class="password-form">
-            <h1>Password</h1>
-            <input
-                type="password"
-                class="password-form-input"
-                placeholder="password..."
-            />
-            <br /><br />
-            <button>Enter Password</button>
-        </form>
+            <form class="password-form2">
+                <h1>Set your encryption password</h1>
+                <input
+                    type="password"
+                    class="password-form2-input"
+                    placeholder="password..."
+                />
+                <br /><br />
+                <input
+                    type="checkbox"
+                    class="password-form2-checkbox2"
+                    checked
+                />
+                Remember me <br /><br />
+                <input type="checkbox" class="password-form2-checkbox" /> I
+                would prefer to store notes unencrypted <br /><br />
+                <button>Generate new password</button>
+            </form>
 
-        <form class="password-form2">
-            <h1>Set your encryption password</h1>
-            <input
-                type="password"
-                class="password-form2-input"
-                placeholder="password..."
-            />
-            <br /><br />
-            <input type="checkbox" class="password-form2-checkbox2" checked /> Remember me <br /><br />
-            <input type="checkbox" class="password-form2-checkbox" /> I would
-            prefer to store notes unencrypted <br /><br />
-            <button>Generate new password</button>
-        </form>
-
-        <main>
-            <section class="note-display">
-                <div id="list"></div>
-            </section>
-        </main>
+            <main>
+                <section class="note-display">
+                    <div id="list"></div>
+                </section>
+            </main>
+        </section>
 
         <section class="view-note">
             <header>
@@ -138,9 +145,11 @@
                     <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
                 </svg>
             </header>
-            <div class="view-note-form" data-note-id="">
-                <h1 id="view-title"></h1>
-                <div id="view-body"></div>
+            <div class="not-header">
+                <div class="view-note-form" data-note-id="">
+                    <h1 id="view-title"></h1>
+                    <div id="view-body"></div>
+                </div>
             </div>
         </section>
 
@@ -185,23 +194,25 @@
                     <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
                 </svg>
             </header>
-            <form class="edit-note-form" data-note-id="">
-                <div class="new-note-title">
-                    <textarea
-                        id="title"
-                        maxlength="70"
-                        placeholder="Note title..."
-                        required
-                    ></textarea>
-                </div>
-                <div class="new-note-text">
-                    <textarea
-                        id="body"
-                        placeholder="Note text..."
-                        required
-                    ></textarea>
-                </div>
-            </form>
+            <div class="not-header">
+                <form class="edit-note-form" data-note-id="">
+                    <div class="new-note-title">
+                        <textarea
+                            id="title"
+                            maxlength="70"
+                            placeholder="Note title..."
+                            required
+                        ></textarea>
+                    </div>
+                    <div class="new-note-text">
+                        <textarea
+                            id="body"
+                            placeholder="Note text..."
+                            required
+                        ></textarea>
+                    </div>
+                </form>
+            </div>
         </section>
     </body>
 </html>

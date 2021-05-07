@@ -21,7 +21,15 @@ const list = document.querySelector("#list"),
     viewNote = document.querySelector(".view-note"),
     form2 = document.querySelector(".edit-note-form"),
     md = new Remarkable(),
-    bcrypt = dcodeIO.bcrypt;
+    bcrypt = dcodeIO.bcrypt,
+    passwordForm = document.querySelector(".password-form"),
+    passwordFormInput = document.querySelector(".password-form-input"),
+    passwordForm2 = document.querySelector(".password-form2"),
+    passwordForm2Input = document.querySelector(".password-form2-input"),
+    passwordForm2Checkbox = document.querySelector(".password-form2-checkbox"),
+    passwordForm2Checkbox2 = document.querySelector(
+        ".password-form2-checkbox2"
+    );
 
 let password;
 
@@ -69,10 +77,10 @@ newClicker.createClick();
 
 function showNewNote(add) {
     if (add) {
-        const note = new Note()
-        note.save()
-        showViewNote(true)
-        editItem(note.id)
+        const note = new Note();
+        note.save();
+        showViewNote(true);
+        editItem(note.id);
     }
 }
 
@@ -110,12 +118,16 @@ bodyInput.addEventListener("input", autoResizeHeight);
 
 function autoResizeHeight() {
     bodyInput.style.height = "auto";
-    bodyInput.style.height =
-        bodyInput.scrollHeight + "px";
+    bodyInput.style.height = bodyInput.scrollHeight + "px";
 }
 
 class Note {
-    constructor(title = "", body = "", timestamps = new Date(), id = Note.all().length) {
+    constructor(
+        title = "",
+        body = "",
+        timestamps = new Date(),
+        id = Note.all().length
+    ) {
         this.title = title;
         this.body = body;
         this.timestamps = timestamps;
@@ -147,7 +159,9 @@ class Note {
     static allArray() {
         let notes = [];
         if (localStorage["encryption"] != "false") {
-            password = sessionStorage["password"] ? sessionStorage["password"] : password
+            password = sessionStorage["password"]
+                ? sessionStorage["password"]
+                : password;
             notes = JSON.parse(decrypt(localStorage["notes"], password));
         } else if (localStorage["encryption"] == "false") {
             notes = JSON.parse(localStorage["notes"]);
@@ -158,7 +172,9 @@ class Note {
 
     static saveArray(notes) {
         if (localStorage["encryption"] != "false") {
-            password = sessionStorage["password"] ? sessionStorage["password"] : password
+            password = sessionStorage["password"]
+                ? sessionStorage["password"]
+                : password;
             localStorage["notes"] = encrypt(JSON.stringify(notes), password);
         } else if (localStorage["encryption"] == "false") {
             localStorage["notes"] = JSON.stringify(notes);
@@ -344,29 +360,17 @@ function editItem(noteId) {
 
     form2.onsubmit = function (e) {
         e.preventDefault();
-        Note.updateNote(
-            noteId,
-            titleInput.value,
-            bodyInput.value
-        );
+        Note.updateNote(noteId, titleInput.value, bodyInput.value);
         showEditNote(false);
     };
 
     bodyInput.oninput = function () {
-        Note.updateNote(
-            noteId,
-            titleInput.value,
-            bodyInput.value
-        );
+        Note.updateNote(noteId, titleInput.value, bodyInput.value);
         updateViewNote(note);
     };
 
     titleInput.oninput = function () {
-        Note.updateNote(
-            noteId,
-            titleInput.value,
-            bodyInput.value
-        );
+        Note.updateNote(noteId, titleInput.value, bodyInput.value);
         updateViewNote();
     };
 }
@@ -374,9 +378,7 @@ function editItem(noteId) {
 function updateViewNote() {
     console.log("dasdasd");
     document.querySelector("#view-title").innerText = titleInput.value;
-    document.querySelector("#view-body").innerHTML = md.render(
-        bodyInput.value
-    );
+    document.querySelector("#view-body").innerHTML = md.render(bodyInput.value);
 }
 
 function viewItemHandler(e) {
@@ -430,15 +432,6 @@ if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js");
 }
 
-const passwordForm = document.querySelector(".password-form"),
-    passwordFormInput = document.querySelector(".password-form-input");
-const passwordForm2 = document.querySelector(".password-form2"),
-    passwordForm2Input = document.querySelector(".password-form2-input"),
-    passwordForm2Checkbox = document.querySelector(".password-form2-checkbox"),
-    passwordForm2Checkbox2 = document.querySelector(
-        ".password-form2-checkbox2"
-    );
-
 if (localStorage["encryption"] != "false") {
     if (!sessionStorage["password"]) {
         if (!localStorage["password"]) {
@@ -459,13 +452,13 @@ function askForPassword() {
     passwordForm.classList.add("show");
     passwordForm.onsubmit = function (e) {
         e.preventDefault();
-        console.log("Checking password with hash...")
+        console.log("Checking password with hash...");
         bcrypt.compare(
             passwordFormInput.value,
             localStorage["password"],
             function (err, res) {
                 if (res == true) {
-                    console.log("Password is correct")
+                    console.log("Password is correct");
                     if (localStorage["remember"] != "false") {
                         sessionStorage["password"] = passwordFormInput.value;
                     }
@@ -474,7 +467,7 @@ function askForPassword() {
                     Note.initialize();
                     Note.displayData();
                 } else {
-                    console.log("Password is incorrect")
+                    console.log("Password is incorrect");
                     // deny();
                 }
             }
@@ -505,3 +498,23 @@ function setPassword() {
         passwordForm2.classList.remove("show");
     };
 }
+
+// function download(data, filename, type) {
+//     var file = new Blob([data], {type: type});
+//     if (window.navigator.msSaveOrOpenBlob) // IE10+
+//         window.navigator.msSaveOrOpenBlob(file, filename);
+//     else { // Others
+//         var a = document.createElement("a"),
+//                 url = URL.createObjectURL(file);
+//         a.href = url;
+//         a.download = filename;
+//         document.body.appendChild(a);
+//         a.click();
+//         setTimeout(function() {
+//             document.body.removeChild(a);
+//             window.URL.revokeObjectURL(url);
+//         }, 0);
+//     }
+// }
+
+// download(Note.all()[0].body, Note.all()[0].title, "text/markdown")
