@@ -24,6 +24,8 @@ const list = document.querySelector("#list"),
     md = new Remarkable(),
     bcrypt = dcodeIO.bcrypt;
 
+let password;
+
 class Clicker {
     constructor(element, action, parameters = null) {
         this.element = element;
@@ -143,10 +145,7 @@ class Note {
     static initialize() {
         if (!localStorage["notes"]) {
             if (localStorage["encryption"] != "false") {
-                localStorage["notes"] = encrypt(
-                    JSON.stringify([]),
-                    sessionStorage["password"]
-                );
+                localStorage["notes"] = encrypt(JSON.stringify([]), password);
             } else if (localStorage["encryption"] == "false") {
                 localStorage["notes"] = JSON.stringify([]);
             }
@@ -156,37 +155,38 @@ class Note {
     static create(title, body) {
         let newItem = { title: title, body: body, timestamps: new Date() };
 
-        if (localStorage["encryption"] != "false") {
-            let notes = JSON.parse(
-                decrypt(localStorage["notes"], sessionStorage["password"])
-            );
+        let notes = Note.allArray();
 
-            notes.push(newItem);
+        notes.push(newItem);
 
-            localStorage["notes"] = encrypt(
-                JSON.stringify(notes),
-                sessionStorage["password"]
-            );
-        } else if (localStorage["encryption"] == "false") {
-            let notes = JSON.parse(localStorage["notes"]);
-
-            notes.push(newItem);
-
-            localStorage["notes"] = JSON.stringify(notes);
-        }
+        Note.saveArray(notes);
 
         console.log("Note created");
     }
 
-    static all() {
-        let notes = []
+    static allArray() {
+        let notes = [];
         if (localStorage["encryption"] != "false") {
-            notes = JSON.parse(
-                decrypt(localStorage["notes"], sessionStorage["password"])
-            );
+            password = sessionStorage["password"] ? sessionStorage["password"] : password
+            notes = JSON.parse(decrypt(localStorage["notes"], password));
         } else if (localStorage["encryption"] == "false") {
             notes = JSON.parse(localStorage["notes"]);
         }
+
+        return notes;
+    }
+
+    static saveArray(notes) {
+        if (localStorage["encryption"] != "false") {
+            password = sessionStorage["password"] ? sessionStorage["password"] : password
+            localStorage["notes"] = encrypt(JSON.stringify(notes), password);
+        } else if (localStorage["encryption"] == "false") {
+            localStorage["notes"] = JSON.stringify(notes);
+        }
+    }
+
+    static all() {
+        let notes = Note.allArray();
 
         let notesObjects = [];
 
@@ -206,14 +206,7 @@ class Note {
     }
 
     save() {
-        let notes = []
-        if (localStorage["encryption"] != "false") {
-            notes = JSON.parse(
-                decrypt(localStorage["notes"], sessionStorage["password"])
-            );
-        } else if (localStorage["encryption"] == "false") {
-            notes = JSON.parse(localStorage["notes"]);
-        }
+        let notes = Note.allArray();
 
         if (notes[this.id]) {
             let editedItem = {
@@ -224,14 +217,7 @@ class Note {
 
             notes[this.id] = editedItem;
 
-            if (localStorage["encryption"] != "false") {
-                localStorage["notes"] = encrypt(
-                    JSON.stringify(notes),
-                    sessionStorage["password"]
-                );
-            } else if (localStorage["encryption"] == "false") {
-                localStorage["notes"] = JSON.stringify(notes);
-            }
+            Note.saveArray(notes);
 
             console.log("Note " + this.id + " updated.");
         } else {
@@ -243,39 +229,18 @@ class Note {
 
             notes.push(newItem);
 
-            if (localStorage["encryption"] != "false") {
-                localStorage["notes"] = encrypt(
-                    JSON.stringify(notes),
-                    sessionStorage["password"]
-                );
-            } else if (localStorage["encryption"] == "false") {
-                localStorage["notes"] = JSON.stringify(notes);
-            }
+            Note.saveArray(notes);
 
             console.log("Note created");
         }
     }
 
     destroy() {
-        let notes = []
-        if (localStorage["encryption"] != "false") {
-            notes = JSON.parse(
-                decrypt(localStorage["notes"], sessionStorage["password"])
-            );
-        } else if (localStorage["encryption"] == "false") {
-            notes = JSON.parse(localStorage["notes"]);
-        }
+        let notes = Note.allArray();
 
         notes.splice(this.id, 1);
 
-        if (localStorage["encryption"] != "false") {
-            localStorage["notes"] = encrypt(
-                JSON.stringify(notes),
-                sessionStorage["password"]
-            );
-        } else if (localStorage["encryption"] == "false") {
-            localStorage["notes"] = JSON.stringify(notes);
-        }
+        Note.saveArray(notes);
 
         Note.displayData();
         console.log("Note " + this.id + " deleted.");
@@ -292,25 +257,11 @@ class Note {
             timestamps: new Date(),
         };
 
-        let notes = []
-        if (localStorage["encryption"] != "false") {
-            notes = JSON.parse(
-                decrypt(localStorage["notes"], sessionStorage["password"])
-            );
-        } else if (localStorage["encryption"] == "false") {
-            notes = JSON.parse(localStorage["notes"]);
-        }
+        let notes = Note.allArray();
 
         notes[noteId] = editedItem;
 
-        if (localStorage["encryption"] != "false") {
-            localStorage["notes"] = encrypt(
-                JSON.stringify(notes),
-                sessionStorage["password"]
-            );
-        } else if (localStorage["encryption"] == "false") {
-            localStorage["notes"] = JSON.stringify(notes);
-        }
+        Note.saveArray(notes);
 
         console.log("Note " + noteId + " updated.");
 
@@ -321,25 +272,11 @@ class Note {
     }
 
     static destroy(noteId) {
-        let notes = []
-        if (localStorage["encryption"] != "false") {
-            notes = JSON.parse(
-                decrypt(localStorage["notes"], sessionStorage["password"])
-            );
-        } else if (localStorage["encryption"] == "false") {
-            notes = JSON.parse(localStorage["notes"]);
-        }
+        let notes = Note.allArray();
 
         notes.splice(noteId, 1);
 
-        if (localStorage["encryption"] != "false") {
-            localStorage["notes"] = encrypt(
-                JSON.stringify(notes),
-                sessionStorage["password"]
-            );
-        } else if (localStorage["encryption"] == "false") {
-            localStorage["notes"] = JSON.stringify(notes);
-        }
+        Note.saveArray(notes);
 
         Note.displayData();
         console.log("Note " + noteId + " deleted.");
@@ -444,7 +381,6 @@ function editItem(noteId) {
             document.querySelector("#body2").value
         );
         showEditNote(false);
-        showViewNote(false);
     };
 
     document.querySelector("#body2").oninput = function () {
@@ -531,7 +467,10 @@ const passwordForm = document.querySelector(".password-form"),
     passwordFormInput = document.querySelector(".password-form-input");
 const passwordForm2 = document.querySelector(".password-form2"),
     passwordForm2Input = document.querySelector(".password-form2-input"),
-    passwordForm2Checkbox = document.querySelector(".password-form2-checkbox");
+    passwordForm2Checkbox = document.querySelector(".password-form2-checkbox"),
+    passwordForm2Checkbox2 = document.querySelector(
+        ".password-form2-checkbox2"
+    );
 
 if (localStorage["encryption"] != "false") {
     if (!sessionStorage["password"]) {
@@ -553,16 +492,22 @@ function askForPassword() {
     passwordForm.classList.add("show");
     passwordForm.onsubmit = function (e) {
         e.preventDefault();
+        console.log("Checking password with hash...")
         bcrypt.compare(
             passwordFormInput.value,
             localStorage["password"],
             function (err, res) {
                 if (res == true) {
-                    sessionStorage["password"] = passwordFormInput.value;
+                    console.log("Password is correct")
+                    if (localStorage["remember"] != "false") {
+                        sessionStorage["password"] = passwordFormInput.value;
+                    }
+                    password = passwordFormInput.value;
                     passwordForm.classList.remove("show");
                     Note.initialize();
                     Note.displayData();
                 } else {
+                    console.log("Password is incorrect")
                     // deny();
                 }
             }
@@ -573,19 +518,23 @@ function askForPassword() {
 function setPassword() {
     passwordForm2.classList.add("show");
     passwordForm2.onsubmit = function (e) {
+        e.preventDefault();
         if (!passwordForm2Checkbox.checked) {
             e.preventDefault();
             const salt = bcrypt.genSaltSync(10);
             const hash = bcrypt.hashSync(passwordForm2Input.value, salt);
             localStorage["password"] = hash;
-            sessionStorage["password"] = passwordForm2Input.value;
-            passwordForm2.classList.remove("show");
-            Note.initialize();
-            Note.displayData();
+            if (passwordForm2Checkbox2.checked) {
+                sessionStorage["password"] = passwordForm2Input.value;
+            } else {
+                localStorage["remember"] = false;
+            }
+            password = passwordForm2Input.value;
         } else {
             localStorage["encryption"] = false;
-            Note.initialize();
-            Note.displayData();
         }
+        Note.initialize();
+        Note.displayData();
+        passwordForm2.classList.remove("show");
     };
 }

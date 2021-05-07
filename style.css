@@ -218,9 +218,9 @@ th {
 }
 
 button {
-    appearance: none;
     -webkit-appearance: none;
     -moz-appearance: none;
+    appearance: none;
     font-family: 'Open Sans', sans-serif;
     padding: 0.8rem;
     font-size: 1rem;
