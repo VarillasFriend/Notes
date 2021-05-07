@@ -218,9 +218,6 @@ th {
 }
 
 button {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
     font-family: 'Open Sans', sans-serif;
     padding: 0.8rem;
     font-size: 1rem;
@@ -229,6 +226,10 @@ button {
     font-weight: bold;
     color: black;
     cursor: pointer;
+    display: block;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }
 
 button:hover {
