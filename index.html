@@ -12,6 +12,7 @@
             src="https://cdn.jsdelivr.net/remarkable/1.7.1/remarkable.min.js"
             defer
         ></script>
+        <script src="bcrypt.js" defer></script>
         <script src="index.js" defer></script>
         <link rel="manifest" href="manifest.webmanifest" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -19,6 +20,7 @@
             href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Ubuntu+Mono&family=Volkhov&display=swap"
             rel="stylesheet"
         />
+        <script src="https://cdn.jsdelivr.net/npm/node-forge@0.7.0/dist/forge.min.js"></script>
 
         <title>Notes</title>
     </head>
@@ -46,7 +48,17 @@
             </svg>
         </header>
 
-        
+        <form class='password-form'>
+            <h1> Password </h1>
+            <input type='password' class='password-form-input' placeholder="password..."> <br><br>
+            <button>Enter Password</button>
+        </form>
+
+        <form class='password-form2'>
+            <h1> Set your encryption password </h1>
+            <input type='password' class='password-form2-input' placeholder="password..."> <br><br>
+            <button>Generate new password</button>
+        </form>
 
         <main>
             <section class="note-display">

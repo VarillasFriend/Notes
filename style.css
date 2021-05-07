@@ -198,7 +198,7 @@ th {
 }
 
 #view-body {
-    word-break: break-all;
+    overflow-wrap: break-word;
 }
 
 #view-body h1 {
@@ -210,11 +210,11 @@ th {
 }
 
 #view-title {
-    word-break: break-all;
+    overflow-wrap: break-word;
 }
 
 .textpreview {
-    word-break: break-all;
+    overflow-wrap: break-word;
 }
 
 button {
@@ -234,4 +234,18 @@ button {
 button:hover {
     color: black;
     background-color: #CCC;
+}
+
+.password-form, .password-form2 {
+    display: none;
+    padding: 1rem;
+    padding-top: 2rem;
+}
+
+.password-form-input, .password-form2-input {
+    margin-top: 1rem;
+}
+
+.password-form.show, .password-form2.show {
+    display: block;
 }

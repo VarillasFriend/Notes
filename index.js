@@ -1,15 +1,28 @@
+function encrypt(message = "", key = "") {
+    var message = CryptoJS.AES.encrypt(message, key);
+    return message.toString();
+}
+
+function decrypt(message = "", key = "") {
+    var code = CryptoJS.AES.decrypt(message, key);
+    var decryptedMessage = code.toString(CryptoJS.enc.Utf8);
+
+    return decryptedMessage;
+}
+
 // Create needed constants
 const list = document.querySelector("#list"),
     titleInput = document.querySelector("#title"),
     bodyInput = document.querySelector("#body"),
-    form = document.querySelector("form"),
+    form = document.querySelectorAll("form")[2],
     submitBtn = document.querySelector("form button"),
     edit = document.querySelector(".icon-tabler-edit"),
     newNote = document.querySelector(".new-note"),
     editNote = document.querySelector(".edit-note"),
     viewNote = document.querySelector(".view-note"),
     form2 = document.querySelector(".edit-note-form"),
-    md = new Remarkable();
+    md = new Remarkable(),
+    bcrypt = dcodeIO.bcrypt;
 
 class Clicker {
     constructor(element, action, parameters = null) {
@@ -58,6 +71,7 @@ xClicker.createClick();
 
 function showNewNote(add) {
     if (add) {
+        document.querySelector("#body").style.height = "auto";
         newNote.classList.add("show-new-note");
         document.querySelector("main").classList.add("shift");
     } else {
@@ -116,9 +130,7 @@ function autoResizeHeight2() {
         document.querySelector("#body2").scrollHeight + "px";
 }
 
-form.onsubmit =function () {
-    addItem;
-}
+form.onsubmit = addItem;
 
 class Note {
     constructor(title, body, timestamps = new Date(), id = Note.all().length) {
@@ -130,24 +142,34 @@ class Note {
 
     static initialize() {
         if (!localStorage["notes"]) {
-            localStorage["notes"] = JSON.stringify([]);
+            localStorage["notes"] = encrypt(
+                JSON.stringify([]),
+                sessionStorage["password"]
+            );
         }
     }
 
     static create(title, body) {
         let newItem = { title: title, body: body, timestamps: new Date() };
 
-        let notes = JSON.parse(localStorage["notes"]);
+        let notes = JSON.parse(
+            decrypt(localStorage["notes"], sessionStorage["password"])
+        );
 
         notes.push(newItem);
 
-        localStorage["notes"] = JSON.stringify(notes);
+        localStorage["notes"] = encrypt(
+            JSON.stringify(notes),
+            sessionStorage["password"]
+        );
 
         console.log("Note created");
     }
 
     static all() {
-        const notes = JSON.parse(localStorage["notes"]);
+        const notes = JSON.parse(
+            decrypt(localStorage["notes"], sessionStorage["password"])
+        );
         let notesObjects = [];
 
         notes.forEach(function (note) {
@@ -166,7 +188,9 @@ class Note {
     }
 
     save() {
-        let notes = JSON.parse(localStorage["notes"]);
+        let notes = JSON.parse(
+            decrypt(localStorage["notes"], sessionStorage["password"])
+        );
 
         if (notes[this.id]) {
             let editedItem = {
@@ -177,7 +201,10 @@ class Note {
 
             notes[this.id] = editedItem;
 
-            localStorage["notes"] = JSON.stringify(notes);
+            localStorage["notes"] = encrypt(
+                JSON.stringify(notes),
+                sessionStorage["password"]
+            );
 
             console.log("Note " + this.id + " updated.");
         } else {
@@ -189,18 +216,26 @@ class Note {
 
             notes.push(newItem);
 
-            localStorage["notes"] = JSON.stringify(notes);
+            localStorage["notes"] = encrypt(
+                JSON.stringify(notes),
+                sessionStorage["password"]
+            );
 
             console.log("Note created");
         }
     }
 
     destroy() {
-        let notes = JSON.parse(localStorage["notes"]);
+        let notes = JSON.parse(
+            decrypt(localStorage["notes"], sessionStorage["password"])
+        );
 
         notes.splice(this.id, 1);
 
-        localStorage["notes"] = JSON.stringify(notes);
+        localStorage["notes"] = encrypt(
+            JSON.stringify(notes),
+            sessionStorage["password"]
+        );
 
         Note.displayData();
         console.log("Note " + this.id + " deleted.");
@@ -217,11 +252,16 @@ class Note {
             timestamps: new Date(),
         };
 
-        let notes = JSON.parse(localStorage["notes"]);
+        let notes = JSON.parse(
+            decrypt(localStorage["notes"], sessionStorage["password"])
+        );
 
         notes[noteId] = editedItem;
 
-        localStorage["notes"] = JSON.stringify(notes);
+        localStorage["notes"] = encrypt(
+            JSON.stringify(notes),
+            sessionStorage["password"]
+        );
 
         console.log("Note " + noteId + " updated.");
 
@@ -232,11 +272,16 @@ class Note {
     }
 
     static destroy(noteId) {
-        let notes = JSON.parse(localStorage["notes"]);
+        let notes = JSON.parse(
+            decrypt(localStorage["notes"], sessionStorage["password"])
+        );
 
         notes.splice(noteId, 1);
 
-        localStorage["notes"] = JSON.stringify(notes);
+        localStorage["notes"] = encrypt(
+            JSON.stringify(notes),
+            sessionStorage["password"]
+        );
 
         Note.displayData();
         console.log("Note " + noteId + " deleted.");
@@ -364,9 +409,13 @@ function editItem(noteId) {
 }
 
 function updateViewNote(note) {
-    console.log('dasdasd')
-    document.querySelector("#view-title").innerText = document.querySelector("#title2").value;
-    document.querySelector("#view-body").innerHTML = md.render(document.querySelector("#body2").value);
+    console.log("dasdasd");
+    document.querySelector("#view-title").innerText = document.querySelector(
+        "#title2"
+    ).value;
+    document.querySelector("#view-body").innerHTML = md.render(
+        document.querySelector("#body2").value
+    );
 }
 
 function viewItemHandler(e) {
@@ -416,11 +465,57 @@ function viewItem(noteId) {
     });
 }
 
-window.onload = function () {
-    Note.initialize();
-    Note.displayData();
-};
-
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js");
+}
+
+const passwordForm = document.querySelector(".password-form"),
+    passwordFormInput = document.querySelector(".password-form-input");
+const passwordForm2 = document.querySelector(".password-form2"),
+    passwordForm2Input = document.querySelector(".password-form2-input");
+
+if (!sessionStorage["password"]) {
+    if (!localStorage["password"]) {
+        setPassword();
+    } else {
+        askForPassword();
+    }
+} else {
+    Note.initialize();
+    Note.displayData();
+}
+
+function askForPassword() {
+    passwordForm.classList.add("show");
+    passwordForm.onsubmit = function (e) {
+        e.preventDefault();
+        bcrypt.compare(
+            passwordFormInput.value,
+            localStorage["password"],
+            function (err, res) {
+                if (res == true) {
+                    sessionStorage["password"] = passwordFormInput.value;
+                    passwordForm.classList.remove("show");
+                    Note.initialize();
+                    Note.displayData();
+                } else {
+                    // deny();
+                }
+            }
+        );
+    };
+}
+
+function setPassword() {
+    passwordForm2.classList.add("show");
+    passwordForm2.onsubmit = function (e) {
+        e.preventDefault();
+        const salt = bcrypt.genSaltSync(10);
+        const hash = bcrypt.hashSync(passwordForm2Input.value, salt);
+        localStorage["password"] = hash;
+        sessionStorage["password"] = passwordForm2Input.value;
+        passwordForm2.classList.remove("show");
+        Note.initialize();
+        Note.displayData();
+    };
 }
