@@ -79,49 +79,6 @@
             </section>
         </main>
 
-        <section class="new-note">
-            <header>
-                <div id="back">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="icon icon-tabler icon-tabler-x2"
-                        width="44"
-                        height="44"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        fill="none"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <polyline points="15 6 9 12 15 18" />
-                    </svg>
-                    <h1>Notes</h1>
-                </div>
-            </header>
-            <form class="new-note-form">
-                <div class="new-note-title">
-                    <textarea
-                        id="title"
-                        maxlength="70"
-                        placeholder="Note title..."
-                        required
-                    ></textarea>
-                </div>
-                <div class="new-note-text">
-                    <textarea
-                        id="body"
-                        placeholder="Note text..."
-                        required
-                    ></textarea>
-                </div>
-                <div>
-                    <button>Create New Note</button>
-                </div>
-            </form>
-        </section>
-
         <section class="view-note">
             <header>
                 <div id="back2">
@@ -231,7 +188,7 @@
             <form class="edit-note-form" data-note-id="">
                 <div class="new-note-title">
                     <textarea
-                        id="title2"
+                        id="title"
                         maxlength="70"
                         placeholder="Note title..."
                         required
@@ -239,13 +196,10 @@
                 </div>
                 <div class="new-note-text">
                     <textarea
-                        id="body2"
+                        id="body"
                         placeholder="Note text..."
                         required
                     ></textarea>
-                </div>
-                <div>
-                    <button id="edit">Edit Note</button>
                 </div>
             </form>
         </section>

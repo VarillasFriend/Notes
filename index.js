@@ -17,7 +17,6 @@ const list = document.querySelector("#list"),
     form = document.querySelectorAll("form")[2],
     submitBtn = document.querySelector("form button"),
     edit = document.querySelector(".icon-tabler-edit"),
-    newNote = document.querySelector(".new-note"),
     editNote = document.querySelector(".edit-note"),
     viewNote = document.querySelector(".view-note"),
     form2 = document.querySelector(".edit-note-form"),
@@ -68,21 +67,12 @@ newClicker = new Clicker(
 );
 newClicker.createClick();
 
-xClicker = new Clicker(document.querySelector("#back"), showNewNote, false);
-xClicker.createClick();
-
 function showNewNote(add) {
     if (add) {
-        document.querySelector("#body").style.height = "auto";
-        newNote.classList.add("show-new-note");
-        document.querySelector("main").classList.add("shift");
-    } else {
-        newNote.classList.remove("show-new-note");
-        document.querySelector("#title").innerText = "";
-        document.querySelector("#body").innerHTML = "";
-        newNote.classList.add("not-show-new-note");
-        document.querySelector("main").classList.remove("shift");
-        setTimeout(() => newNote.classList.remove("not-show-new-note"), 500);
+        const note = new Note()
+        note.save()
+        showViewNote(true)
+        editItem(note.id)
     }
 }
 
@@ -109,33 +99,23 @@ function showEditNote(add) {
         editNote.classList.add("show-edit-note");
     } else {
         editNote.classList.remove("show-edit-note");
-        document.querySelector("#title2").value = "";
-        document.querySelector("#body2").value = "";
+        titleInput.value = "";
+        bodyInput.value = "";
         editNote.classList.add("not-show-edit-note");
         setTimeout(() => editNote.classList.remove("not-show-edit-note"), 500);
     }
 }
 
-document.querySelector("#body").addEventListener("input", autoResizeHeight);
+bodyInput.addEventListener("input", autoResizeHeight);
 
 function autoResizeHeight() {
-    document.querySelector("#body").style.height = "auto";
-    document.querySelector("#body").style.height =
-        document.querySelector("#body").scrollHeight + "px";
+    bodyInput.style.height = "auto";
+    bodyInput.style.height =
+        bodyInput.scrollHeight + "px";
 }
-
-document.querySelector("#body2").addEventListener("input", autoResizeHeight2);
-
-function autoResizeHeight2() {
-    document.querySelector("#body2").style.height = "auto";
-    document.querySelector("#body2").style.height =
-        document.querySelector("#body2").scrollHeight + "px";
-}
-
-form.onsubmit = addItem;
 
 class Note {
-    constructor(title, body, timestamps = new Date(), id = Note.all().length) {
+    constructor(title = "", body = "", timestamps = new Date(), id = Note.all().length) {
         this.title = title;
         this.body = body;
         this.timestamps = timestamps;
@@ -267,8 +247,8 @@ class Note {
 
         Note.displayData();
 
-        document.querySelector("#title2").innerText = "";
-        document.querySelector("#body2").innerHTML = "";
+        titleInput.innerText = "";
+        bodyInput.innerHTML = "";
     }
 
     static destroy(noteId) {
@@ -342,27 +322,16 @@ class Note {
     }
 }
 
-function addItem(e) {
-    e.preventDefault();
-    Note.create(titleInput.value, bodyInput.value);
-
-    Note.displayData();
-    showNewNote(false);
-
-    titleInput.value = "";
-    bodyInput.value = "";
-}
-
 function editItem(noteId) {
     const notes = Note.all();
     note = notes[noteId];
 
     showEditNote(true);
 
-    document.querySelector("#title2").value = note.title;
-    document.querySelector("#body2").value = note.body;
-    document.querySelector("#body2").focus();
-    autoResizeHeight2();
+    titleInput.value = note.title;
+    bodyInput.value = note.body;
+    bodyInput.focus();
+    autoResizeHeight();
 
     form2.setAttribute("data-note-id", note.id);
 
@@ -377,38 +346,36 @@ function editItem(noteId) {
         e.preventDefault();
         Note.updateNote(
             noteId,
-            document.querySelector("#title2").value,
-            document.querySelector("#body2").value
+            titleInput.value,
+            bodyInput.value
         );
         showEditNote(false);
     };
 
-    document.querySelector("#body2").oninput = function () {
+    bodyInput.oninput = function () {
         Note.updateNote(
             noteId,
-            document.querySelector("#title2").value,
-            document.querySelector("#body2").value
+            titleInput.value,
+            bodyInput.value
         );
         updateViewNote(note);
     };
 
-    document.querySelector("#title2").oninput = function () {
+    titleInput.oninput = function () {
         Note.updateNote(
             noteId,
-            document.querySelector("#title2").value,
-            document.querySelector("#body2").value
+            titleInput.value,
+            bodyInput.value
         );
-        updateViewNote(note);
+        updateViewNote();
     };
 }
 
-function updateViewNote(note) {
+function updateViewNote() {
     console.log("dasdasd");
-    document.querySelector("#view-title").innerText = document.querySelector(
-        "#title2"
-    ).value;
+    document.querySelector("#view-title").innerText = titleInput.value;
     document.querySelector("#view-body").innerHTML = md.render(
-        document.querySelector("#body2").value
+        bodyInput.value
     );
 }
 
@@ -538,23 +505,3 @@ function setPassword() {
         passwordForm2.classList.remove("show");
     };
 }
-
-// function download(data, filename, type) {
-//     var file = new Blob([data], {type: type});
-//     if (window.navigator.msSaveOrOpenBlob) // IE10+
-//         window.navigator.msSaveOrOpenBlob(file, filename);
-//     else { // Others
-//         var a = document.createElement("a"),
-//                 url = URL.createObjectURL(file);
-//         a.href = url;
-//         a.download = filename;
-//         document.body.appendChild(a);
-//         a.click();
-//         setTimeout(function() {
-//             document.body.removeChild(a);
-//             window.URL.revokeObjectURL(url);
-//         }, 0);
-//     }
-// }
-
-// download(Note.all()[0].body, Note.all()[0].title, "text/markdown")

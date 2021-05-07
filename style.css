@@ -1,3 +1,9 @@
+* {
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
 body {
     margin: 0;
     background-color: #000;
@@ -52,6 +58,9 @@ main {
 .view-note-form {
     padding: 20px;
     will-change: transform;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .show-new-note,
