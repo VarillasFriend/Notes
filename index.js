@@ -29,7 +29,8 @@ const list = document.querySelector("#list"),
     passwordForm2Checkbox = document.querySelector(".password-form2-checkbox"),
     passwordForm2Checkbox2 = document.querySelector(
         ".password-form2-checkbox2"
-    );
+    ),
+    popup = document.querySelector(".popuptext");
 
 let password;
 
@@ -66,6 +67,56 @@ class Clicker {
             }
         };
     }
+}
+
+sortClicker = new Clicker(
+    document.getElementsByClassName("icon-tabler-arrows-sort")[0],
+    showSort,
+    true
+);
+sortClicker.createClick();
+
+function showSort(add) {
+    if (add) {
+        popup.classList.toggle("show");
+        tDesc = new Clicker(
+            document.querySelector(".timestamps-desc"),
+            changeSort,
+            "timestamps-desc"
+        ).createClick();
+        tAsc = new Clicker(
+            document.querySelector(".timestamps-asc"),
+            changeSort,
+            "timestamps-asc"
+        ).createClick();
+        cDesc = new Clicker(
+            document.querySelector(".created-desc"),
+            changeSort,
+            "created-desc"
+        ).createClick();
+        cAsc = new Clicker(
+            document.querySelector(".created-asc"),
+            changeSort,
+            "created-asc"
+        ).createClick();
+        tiDesc = new Clicker(
+            document.querySelector(".title-desc"),
+            changeSort,
+            "title-desc"
+        ).createClick();
+        tiAsc = new Clicker(
+            document.querySelector(".title-asc"),
+            changeSort,
+            "title-asc"
+        ).createClick();
+    } else {
+        popup.classList.remove("show");
+    }
+}
+
+function changeSort(sort) {
+    localStorage["sort"] = sort;
+    Note.displayData();
 }
 
 newClicker = new Clicker(
@@ -106,6 +157,8 @@ function showEditNote(add) {
     if (add) {
         editNote.classList.add("show-edit-note");
     } else {
+        updateViewNote();
+        Note.displayData();
         editNote.classList.remove("show-edit-note");
         titleInput.value = "";
         bodyInput.value = "";
@@ -181,7 +234,7 @@ class Note {
         }
     }
 
-    static all() {
+    static all(order = null) {
         let notes = Note.allArray();
 
         let notesObjects = [];
@@ -197,6 +250,42 @@ class Note {
             );
             notesObjects.push(noteObject);
         });
+
+        if (order == "timestamps-asc") {
+            notesObjects.sort((a, b) => {
+                return a.timestamps - b.timestamps;
+            });
+        } else if (order == "timestamps-desc") {
+            notesObjects.sort((a, b) => {
+                return b.timestamps - a.timestamps;
+            });
+        } else if (order == "created-asc") {
+            notesObjects.reverse();
+        } else if (order == "title-asc") {
+            notesObjects.sort((a, b) => {
+                const titleA = a.title.toUpperCase();
+                const titleB = b.title.toUpperCase();
+                if (titleA < titleB) {
+                    return -1;
+                }
+                if (titleA > titleB) {
+                    return 1;
+                }
+                return 0;
+            });
+        } else if (order == "title-desc") {
+            notesObjects.sort((a, b) => {
+                const titleA = a.title.toUpperCase();
+                const titleB = b.title.toUpperCase();
+                if (titleA > titleB) {
+                    return -1;
+                }
+                if (titleA < titleB) {
+                    return 1;
+                }
+                return 0;
+            });
+        }
 
         return notesObjects;
     }
@@ -260,11 +349,6 @@ class Note {
         Note.saveArray(notes);
 
         console.log("Note " + noteId + " updated.");
-
-        Note.displayData();
-
-        titleInput.innerText = "";
-        bodyInput.innerHTML = "";
     }
 
     static destroy(noteId) {
@@ -285,7 +369,10 @@ class Note {
             list.removeChild(list.firstChild);
         }
 
-        const notes = Note.all();
+        const sort = localStorage["sort"]
+            ? localStorage["sort"]
+            : "timestamps-desc";
+        const notes = Note.all(sort);
 
         notes.forEach(function (note) {
             const listItem = document.createElement("div");
@@ -366,12 +453,10 @@ function editItem(noteId) {
 
     bodyInput.oninput = function () {
         Note.updateNote(noteId, titleInput.value, bodyInput.value);
-        updateViewNote(note);
     };
 
     titleInput.oninput = function () {
         Note.updateNote(noteId, titleInput.value, bodyInput.value);
-        updateViewNote();
     };
 }
 
