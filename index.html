@@ -12,6 +12,7 @@
             src="https://cdn.jsdelivr.net/remarkable/1.7.1/remarkable.min.js"
             defer
         ></script>
+        <script src="autosize.min.js" defer></script>
         <script src="bcrypt.js" defer></script>
         <script src="index.js" defer></script>
         <link rel="manifest" href="manifest.webmanifest" />
@@ -25,6 +26,8 @@
         <title>Notes</title>
     </head>
     <body>
+        <!-- <div class="side-bar"></div> -->
+
         <section class="note-index">
             <header>
                 <h1>Notes</h1>
@@ -46,12 +49,12 @@
                         <path d="M21 15l-4 4l-4 -4m4 4v-14" />
                     </svg>
                     <div class="popuptext">
-                        <p class='sort timestamps-desc'> Last edited </p>
-                        <p class='sort timestamps-asc'> First edited </p>
-                        <p class="sort created-desc"> Last created </p>
-                        <p class="sort created-asc"> First created </p>
-                        <p class="sort title-desc"> By title, descending </p>
-                        <p class="sort title-asc"> By title, ascending </p>
+                        <p class="sort timestamps-desc">Last edited</p>
+                        <p class="sort timestamps-asc">First edited</p>
+                        <p class="sort created-desc">Last created</p>
+                        <p class="sort created-asc">First created</p>
+                        <p class="sort title-desc">By title, descending</p>
+                        <p class="sort title-asc">By title, ascending</p>
                     </div>
                 </div>
                 <svg
@@ -74,7 +77,6 @@
                     <line x1="16" y1="5" x2="19" y2="8" />
                 </svg>
             </header>
-
             <form class="password-form">
                 <h1>Password</h1>
                 <input
@@ -171,11 +173,9 @@
                     <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
                 </svg>
             </header>
-            <div class="not-header">
-                <div class="view-note-form" data-note-id="">
-                    <h1 id="view-title"></h1>
-                    <div id="view-body"></div>
-                </div>
+            <div class="view-note-form" data-note-id="">
+                <h1 id="view-title"></h1>
+                <div id="view-body"></div>
             </div>
         </section>
 
@@ -220,25 +220,23 @@
                     <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
                 </svg>
             </header>
-            <div class="not-header">
-                <form class="edit-note-form" data-note-id="">
-                    <div class="new-note-title">
-                        <textarea
-                            id="title"
-                            maxlength="70"
-                            placeholder="Note title..."
-                            required
-                        ></textarea>
-                    </div>
-                    <div class="new-note-text">
-                        <textarea
-                            id="body"
-                            placeholder="Note text..."
-                            required
-                        ></textarea>
-                    </div>
-                </form>
-            </div>
+            <form class="edit-note-form" data-note-id="">
+                <div class="new-note-title">
+                    <textarea
+                        id="title"
+                        maxlength="70"
+                        placeholder="Note title..."
+                        required
+                    ></textarea>
+                </div>
+                <div class="new-note-text">
+                    <textarea
+                        id="body"
+                        placeholder="Note text..."
+                        required
+                    ></textarea>
+                </div>
+            </form>
         </section>
     </body>
 </html>

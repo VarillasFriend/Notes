@@ -9,6 +9,8 @@ body {
     background-color: #000;
     color: #fff;
     font-family: "Open Sans", sans-serif;
+    display: flex;
+    overflow-y: hidden;
 }
 
 h1,
@@ -31,20 +33,6 @@ header {
     width: 100%;
 }
 
-.view-note header {
-    z-index: 12;
-    position: fixed;
-}
-
-.edit-note header {
-    z-index: 13;
-    position: fixed;
-}
-
-.not-header {
-    margin-top: 75px;
-}
-
 main {
     transition: transform 0.5s cubic-bezier(0, -0.19, 0, 1);
     will-change: transform;
@@ -54,18 +42,36 @@ main {
     padding: 20px;
 }
 
+.note-index {
+    overflow-y: auto;
+    position: absolute;
+    left: 0%;
+    top: 0;
+    bottom: 0;
+    width: 40%;
+}
+
 .new-note,
 .edit-note,
 .view-note {
     background: #000;
     display: none;
-    width: 100%;
+    width: 60%;
     position: fixed;
     top: 0;
     bottom: 0;
-    left: 0;
     right: 0;
-    overflow-y: scroll;
+    overflow-y: auto;
+}
+
+.view-note {
+    display: block;
+}
+
+@media only screen and (max-width: 900px) {
+    .view-note {
+        display: none;
+    }
 }
 
 .new-note-form,
@@ -73,7 +79,6 @@ main {
 .view-note-form {
     padding: 20px;
     will-change: transform;
-    width: 60%;
     margin-left: auto;
     margin-right: auto;
 }
@@ -81,10 +86,18 @@ main {
 .show-new-note,
 .show-edit-note,
 .show-view-note {
-    animation-name: display;
-    animation-duration: 0.5s;
-    animation-timing-function: cubic-bezier(0, -0.19, 0, 1);
     display: block;
+}
+
+@media only screen and (max-width: 900px) {
+    .show-new-note,
+    .show-edit-note,
+    .show-view-note {
+        animation-name: display;
+        animation-duration: 0.5s;
+        animation-timing-function: cubic-bezier(0, -0.19, 0, 1);
+        display: block;
+    }
 }
 
 @keyframes display {
@@ -103,10 +116,18 @@ main {
 .not-show-new-note,
 .not-show-edit-note,
 .not-show-view-note {
-    animation-name: not-display;
-    animation-duration: 0.5s;
-    animation-timing-function: cubic-bezier(0, -0.19, 0, 1);
-    display: block;
+    display: none;
+}
+
+@media only screen and (max-width: 900px) {
+    .not-show-new-note,
+    .not-show-edit-note,
+    .not-show-view-note {
+        animation-name: not-display;
+        animation-duration: 0.5s;
+        animation-timing-function: cubic-bezier(0, -0.19, 0, 1);
+        display: block;
+    }
 }
 
 @keyframes not-display {
@@ -306,3 +327,38 @@ button:hover {
     display: block;
     opacity: 1;
 }
+
+#back2 {
+    display: none;
+}
+
+@media only screen and (max-width: 900px) {
+    #back2 {
+        display: flex;
+    }
+
+    .new-note,
+    .edit-note,
+    .view-note {
+        width: 100%;
+    }
+
+    .note-index {
+        overflow-y: auto;
+        position: absolute;
+        left: 0%;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+    }
+}
+
+/* .side-bar {
+    background-color: #333;
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 15%;
+    margin: 0;
+} */

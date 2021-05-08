@@ -117,6 +117,7 @@ function showSort(add) {
 function changeSort(sort) {
     localStorage["sort"] = sort;
     Note.displayData();
+    showSort(false);
 }
 
 newClicker = new Clicker(
@@ -141,11 +142,11 @@ x2Clicker.createClick();
 function showViewNote(add) {
     if (add) {
         viewNote.classList.add("show-view-note");
-        document.querySelector("main").classList.add("shift");
+        // document.querySelector("main").classList.add("shift");
     } else {
         viewNote.classList.remove("show-view-note");
         viewNote.classList.add("not-show-view-note");
-        document.querySelector("main").classList.remove("shift");
+        // document.querySelector("main").classList.remove("shift");
         setTimeout(() => viewNote.classList.remove("not-show-view-note"), 500);
     }
 }
@@ -167,12 +168,7 @@ function showEditNote(add) {
     }
 }
 
-bodyInput.addEventListener("input", autoResizeHeight);
-
-function autoResizeHeight() {
-    bodyInput.style.height = "auto";
-    bodyInput.style.height = bodyInput.scrollHeight + "px";
-}
+autosize(bodyInput);
 
 class Note {
     constructor(
@@ -434,7 +430,9 @@ function editItem(noteId) {
     titleInput.value = note.title;
     bodyInput.value = note.body;
     bodyInput.focus();
-    autoResizeHeight();
+    bodyInput.style.height = "auto";
+    bodyInput.style.height = bodyInput.scrollHeight + "px";
+    setTimeout(() => (editNote.scrollTop = 0), 0);
 
     form2.setAttribute("data-note-id", note.id);
 
@@ -583,6 +581,14 @@ function setPassword() {
         passwordForm2.classList.remove("show");
     };
 }
+
+const sort1 = localStorage["sort"] ? localStorage["sort"] : "timestamps-desc";
+const note1 = Note.all(sort1)[0];
+document.querySelector("#view-title").innerText = note1.title;
+document.querySelector("#view-body").innerHTML = md.render(note1.body);
+document
+    .querySelector(".view-note-form")
+    .setAttribute("data-note-id", note1.id);
 
 // function download(data, filename, type) {
 //     var file = new Blob([data], {type: type});
